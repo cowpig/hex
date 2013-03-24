@@ -58,15 +58,33 @@ class Player:
         out = {}
         out["type"] = "player"
         out["pieces"] = "pieces"
-        return out
-
+        return json.dump(out)
 
 class Piece:
-    def __init__(self, owner, id, range, cooldown=0):
+    def __init__(self, owner, id, range, loc, cooldown=0):
         self.range = range
         self.id = id
         self.cooldown = cooldown
         self.owner = owner
+        loc.contents = self
+        self.loc = loc
+
+    def vision(self):
+        seen = set([self.loc])
+        to_check = set(self.loc.neighbors())
+        depth = self.range
+        while depth > 0:
+            new_nodes = set()
+            while len(to_check) > 0:
+                n = to_check.pop()
+                seen.add(n)
+                if n.contents == None:
+                    new_nodes = new_nodes.union(set(n.neighbors()))
+            # import pdb
+            # pdb.set_trace()
+            to_check = new_nodes - seen
+            depth -= 1
+        return seen
 
     def __repr__(self):
         out = {}
@@ -75,6 +93,7 @@ class Piece:
         out['id'] = self.id
         out['cooldown'] = self.cooldown
         out['owner'] = self.owner
+        out['loc'] = self.loc.coord
         return json.dumps(out)
 
 class Board:
@@ -146,6 +165,8 @@ class Node:
         self.coord = coord
         self.contents = None
 
+    # returns directions in which there are no neighbors.
+    # used in building board
     def empty_adj(self):
         out = []
         for d in self.dirs:
@@ -153,11 +174,12 @@ class Node:
                 out.append(d)
         return out
 
+    # returns neighboring nodes
     def neighbors(self):
         out = []
-        for d in self.dirs:
-            if self.dirs[d] != None:
-                out.append(d)
+        for v in self.dirs.values():
+            if v != None:
+                out.append(v)
         return out
 
     def landlocked(self):
@@ -178,6 +200,6 @@ class Node:
         out['type'] = "node"
         out['coord'] = self.coord
         out['neighbors'] = self.num_neighbors()
-        out['contents'] = self.contents
+        out['contents'] = None if self.contents == None else self.contents.id
         return json.dumps(out)
 
