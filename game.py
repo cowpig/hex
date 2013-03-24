@@ -49,12 +49,33 @@ def opposite(dir):
     if dir == "NW":
         return "SE"
 
+class Player:
+    def __init__(self, pieces, connection):
+        self.pieces = pieces
+        self.connection = connection
+
+    def __repr__(self):
+        out = {}
+        out["type"] = "player"
+        out["pieces"] = "pieces"
+        return out
+
+
 class Piece:
     def __init__(self, owner, id, range, cooldown=0):
         self.range = range
         self.id = id
         self.cooldown = cooldown
         self.owner = owner
+
+    def __repr__(self):
+        out = {}
+        out['type'] = "piece"
+        out['range'] = self.range
+        out['id'] = self.id
+        out['cooldown'] = self.cooldown
+        out['owner'] = self.owner
+        return json.dumps(out)
 
 class Board:
     def __init__(self, width, height):
@@ -81,19 +102,15 @@ class Board:
                 coastal.remove(n)
 
             # create a new node
-            nextdir = random.choice(n.empty_neighbors())
+            nextdir = random.choice(n.empty_adj())
             new_coord = offset(n.coord, nextdir, width, height)
             new_node = Node((new_coord))
-
-            if self.grid[new_coord[0]][new_coord[1]] != None:
-                import pdb
-                pdb.set_trace()
 
             # connect it to its neighbors
             for dir in new_node.dirs:
                 x, y = offset(new_coord, dir, width, height)
                 other = self.grid[x][y]
-                # try:
+
                 if other != None:
                     new_node.dirs[dir] = self.grid[x][y]
                     self.grid[x][y].dirs[opposite(dir)] = new_node
@@ -101,9 +118,6 @@ class Board:
                     format(new_node, new_node.coord, self.grid[x][y], self.grid[x][y].coord\
                         , dir, opposite(dir))
                     self.log.append(s)
-                # except:
-                #     print self.__repr__()
-                #     print "error binding {} and {}".format(new_node, other)
 
             # put it on the grid
             self.grid[new_node.coord[0]][new_node.coord[1]] = new_node
@@ -130,15 +144,16 @@ class Node:
     def __init__(self, coord, NE=None, E=None, SE=None, SW=None, W=None, NW=None):
         self.dirs = {"NE": NE, "E":E, "SE":SE, "SW":SW, "W":W, "NW":NW}
         self.coord = coord
+        self.contents = None
 
-    def empty_neighbors(self):
+    def empty_adj(self):
         out = []
         for d in self.dirs:
             if self.dirs[d] == None:
                 out.append(d)
         return out
 
-    def nonempty_neighbors(self):
+    def neighbors(self):
         out = []
         for d in self.dirs:
             if self.dirs[d] != None:
@@ -159,4 +174,10 @@ class Node:
         return i
 
     def __repr__(self):
-        return "Node object with {} neighbors at coord {}".format(self.num_neighbors(), self.coord)
+        out = {}
+        out['type'] = "node"
+        out['coord'] = self.coord
+        out['neighbors'] = self.num_neighbors()
+        out['contents'] = self.contents
+        return json.dumps(out)
+
