@@ -1,5 +1,7 @@
 import json, random
 
+# in general, 'loc' will refer to a node, while 'coord' will refer to an (x,y) tuple
+
 def offset(coord, dir, xmax, ymax):
     if coord[1] % 2 == 0:
         if dir == "NE":
@@ -14,6 +16,8 @@ def offset(coord, dir, xmax, ymax):
             return ((coord[0]-1)%xmax, coord[1])
         if dir == "NW":
             return ((coord[0]-1)%xmax, (coord[1]-1)%ymax)
+        else:
+            raise Exception("Must specify a valid direction.")
     else:
         if dir == "NE":
             return ((coord[0]+1)%xmax, (coord[1]-1)%ymax)
@@ -27,6 +31,8 @@ def offset(coord, dir, xmax, ymax):
             return ((coord[0]-1)%xmax, coord[1])
         if dir == "NW":
             return (coord[0]%xmax, (coord[1]-1)%ymax)
+        else:
+            raise Exception("Must specify a valid direction.")
 
         # "NE":(0,-1),\
         # "E":(1,0),\
@@ -49,15 +55,34 @@ def opposite(dir):
     if dir == "NW":
         return "SE"
 
+def home_base(player, loc):
+    description = "Home base for player {}".format(player)
+    return Item(player, loc, description, "#")
+
 class Player:
     def __init__(self, pieces, connection):
         self.pieces = pieces
         self.connection = connection
+        self.moves = []
 
     def __repr__(self):
         out = {}
         out["type"] = "player"
-        out["pieces"] = "pieces"
+        out["pieces"] = self.pieces
+        return json.dump(out)
+
+class Item:
+    def __init__(self, owner, loc, description, ascii):
+        self.owner = owner
+        self.loc = loc
+        self.description = description
+        self.ascii = ascii
+
+    def __repr__(self):
+        out = {}
+        out["type"] = "base"
+        out["owner"] = self.owner
+        out['loc'] = self.loc
         return json.dump(out)
 
 class Piece:
@@ -97,6 +122,7 @@ class Piece:
         return json.dumps(out)
 
 class Board:
+    # note: the home bases of each player will be 
     def __init__(self, width, height):
         self.grid = []
         for x in xrange(width):
@@ -107,12 +133,34 @@ class Board:
                 self.grid[x][y] = None
 
         start = Node((random.randrange(width), random.randrange(height)))
+        start.contents = home_base("player1", start)
         self.grid[start.coord[0]][start.coord[1]] = start
         self.nodes = [start]
+        self.homenodes = [start]
         coastal = [start]
-        self.log = []
+        # self.log = []
 
-        for i in xrange(int((width*height)/1.5)):
+        nodes_between_homes = min(height, width)/2
+        random_dir = random.choice(start.dirs.keys())
+        n = start
+        for i in xrange(nodes_between_homes):
+            new_coord = offset(n.coord, random_dir, width, height)
+            new_node = Node(new_coord)
+            n.dirs[random_dir] = new_node
+            new_node.dirs[opposite(random_dir)] = n
+
+
+            self.grid[new_node.coord[0]][new_node.coord[1]] = new_node
+            self.nodes.append(new_node)
+            coastal.append(new_node)
+            
+            if i == nodes_between_homes - 1:
+                n.contents = home_base("player2", n)
+                self.homenodes.append(n)
+            
+            n = new_node
+
+        for i in xrange(int((width*height)/1.5) - nodes_between_homes):
             # find a coastal node to expand
             while True:
                 n = coastal[random.randrange(len(coastal))]
@@ -133,10 +181,10 @@ class Board:
                 if other != None:
                     new_node.dirs[dir] = self.grid[x][y]
                     self.grid[x][y].dirs[opposite(dir)] = new_node
-                    s = "connecting node {} at {} to node {} at {} | direction {}-{}".\
-                    format(new_node, new_node.coord, self.grid[x][y], self.grid[x][y].coord\
-                        , dir, opposite(dir))
-                    self.log.append(s)
+                    # s = "connecting node {} at {} to node {} at {} | direction {}-{}".\
+                    # format(new_node, new_node.coord, self.grid[x][y], self.grid[x][y].coord\
+                    #     , dir, opposite(dir))
+                    # self.log.append(s)
 
             # put it on the grid
             self.grid[new_node.coord[0]][new_node.coord[1]] = new_node
@@ -155,7 +203,12 @@ class Board:
             if y%2==1:
                 out += ' '
             for x in xrange(len(self.grid)):
-                out += "_{}".format(self.grid[x][y].num_neighbors()) if self.grid[x][y] != None else "--"
+                if self.grid[x][y] == None:
+                    out += "--"
+                elif self.grid[x][y].contents == None:
+                    out += "_{}".format(self.grid[x][y].num_neighbors())
+                else:
+                    out += "_{}".format(self.grid[x][y].contents.ascii)
             out += '\n'
         return out
 
@@ -200,6 +253,6 @@ class Node:
         out['type'] = "node"
         out['coord'] = self.coord
         out['neighbors'] = self.num_neighbors()
-        out['contents'] = None if self.contents == None else self.contents.id
+        out['contents'] = self.contents
         return json.dumps(out)
 
