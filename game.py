@@ -2,124 +2,18 @@ import json, random
 
 # in general, 'loc' will refer to a node, while 'coord' will refer to an (x,y) tuple
 
-def offset(coord, dir, xmax, ymax):
-    if coord[1] % 2 == 0:
-        if dir == "NE":
-            return ((coord[0])%xmax, (coord[1]-1)%ymax)
-        if dir == "E":
-            return ((coord[0]+1)%xmax, coord[1]%ymax)
-        if dir == "SE":
-            return ((coord[0])%xmax, (coord[1]+1)%ymax)
-        if dir == "SW":
-            return ((coord[0]-1)%xmax, (coord[1]+1)%ymax)
-        if dir == "W":
-            return ((coord[0]-1)%xmax, coord[1])
-        if dir == "NW":
-            return ((coord[0]-1)%xmax, (coord[1]-1)%ymax)
-        else:
-            raise Exception("Must specify a valid direction.")
-    else:
-        if dir == "NE":
-            return ((coord[0]+1)%xmax, (coord[1]-1)%ymax)
-        if dir == "E":
-            return ((coord[0]+1)%xmax, coord[1]%ymax)
-        if dir == "SE":
-            return ((coord[0]+1)%xmax, (coord[1]+1)%ymax)
-        if dir == "SW":
-            return ((coord[0])%xmax, (coord[1]+1)%ymax)
-        if dir == "W":
-            return ((coord[0]-1)%xmax, coord[1])
-        if dir == "NW":
-            return (coord[0]%xmax, (coord[1]-1)%ymax)
-        else:
-            raise Exception("Must specify a valid direction.")
 
-        # "NE":(0,-1),\
-        # "E":(1,0),\
-        # "SE":(0,1),\
-        # "SW":(-1,1),\
-        # "W":(-1,0),\
-        # "NW":(-1,-1)}
+# Game board.
+# Is a hexagonal grid, which can be accessed by (x, y) coordinates, arranged like so:
+# (0,0)(1,0)(2,0)(3,0)
+#   (0,1)(1,1)(2,1)(3,1)
+# (0,2)(1,2)(2,2)(3,2)
+#   (0,3)(1,3)(2,3)(3,3)
+# (0,4)(1,4)(2,4)(3,4)
 
-def opposite(dir):
-    if dir == "NE":
-        return "SW"
-    if dir == "E":
-        return "W"
-    if dir == "SE":
-        return "NW"
-    if dir == "SW":
-        return "NE"
-    if dir == "W":
-        return "E"
-    if dir == "NW":
-        return "SE"
-
-def home_base(player, loc):
-    description = "Home base for player {}".format(player)
-    return Item(player, loc, description, "#")
-
-class Player:
-    def __init__(self, pieces, connection):
-        self.pieces = pieces
-        self.connection = connection
-        self.moves = []
-
-    def __repr__(self):
-        out = {}
-        out["type"] = "player"
-        out["pieces"] = self.pieces
-        return json.dump(out)
-
-class Item:
-    def __init__(self, owner, loc, description, ascii):
-        self.owner = owner
-        self.loc = loc
-        self.description = description
-        self.ascii = ascii
-
-    def __repr__(self):
-        out = {}
-        out["type"] = "base"
-        out["owner"] = self.owner
-        out['loc'] = self.loc
-        return json.dump(out)
-
-class Piece:
-    def __init__(self, owner, id, range, loc, cooldown=0):
-        self.range = range
-        self.id = id
-        self.cooldown = cooldown
-        self.owner = owner
-        loc.contents = self
-        self.loc = loc
-
-    def vision(self):
-        seen = set([self.loc])
-        to_check = set(self.loc.neighbors())
-        depth = self.range
-        while depth > 0:
-            new_nodes = set()
-            while len(to_check) > 0:
-                n = to_check.pop()
-                seen.add(n)
-                if n.contents == None:
-                    new_nodes = new_nodes.union(set(n.neighbors()))
-            # import pdb
-            # pdb.set_trace()
-            to_check = new_nodes - seen
-            depth -= 1
-        return seen
-
-    def __repr__(self):
-        out = {}
-        out['type'] = "piece"
-        out['range'] = self.range
-        out['id'] = self.id
-        out['cooldown'] = self.cooldown
-        out['owner'] = self.owner
-        out['loc'] = self.loc.coord
-        return json.dumps(out)
+# Each hex is managed by a Node object, which are effectively graph nodes which
+# can access one another via their .dirs dictionary, with capital letter directional
+# string as keys (e.g. "NE")
 
 class Board:
     # note: the home bases of each player will be 
@@ -256,3 +150,128 @@ class Node:
         out['contents'] = self.contents
         return json.dumps(out)
 
+
+# returns a grid coord (x, y) offset by one unit in the given direction
+def offset(coord, dir, xmax, ymax):
+    if coord[1] % 2 == 0:
+        if dir == "NE":
+            return ((coord[0])%xmax, (coord[1]-1)%ymax)
+        if dir == "E":
+            return ((coord[0]+1)%xmax, coord[1]%ymax)
+        if dir == "SE":
+            return ((coord[0])%xmax, (coord[1]+1)%ymax)
+        if dir == "SW":
+            return ((coord[0]-1)%xmax, (coord[1]+1)%ymax)
+        if dir == "W":
+            return ((coord[0]-1)%xmax, coord[1])
+        if dir == "NW":
+            return ((coord[0]-1)%xmax, (coord[1]-1)%ymax)
+        else:
+            raise Exception("Must specify a valid direction.")
+    else:
+        if dir == "NE":
+            return ((coord[0]+1)%xmax, (coord[1]-1)%ymax)
+        if dir == "E":
+            return ((coord[0]+1)%xmax, coord[1]%ymax)
+        if dir == "SE":
+            return ((coord[0]+1)%xmax, (coord[1]+1)%ymax)
+        if dir == "SW":
+            return ((coord[0])%xmax, (coord[1]+1)%ymax)
+        if dir == "W":
+            return ((coord[0]-1)%xmax, coord[1])
+        if dir == "NW":
+            return (coord[0]%xmax, (coord[1]-1)%ymax)
+        else:
+            raise Exception("Must specify a valid direction.")
+
+        # "NE":(0,-1),\
+        # "E":(1,0),\
+        # "SE":(0,1),\
+        # "SW":(-1,1),\
+        # "W":(-1,0),\
+        # "NW":(-1,-1)}
+
+# returns the opposite of the given direction
+def opposite(dir):
+    if dir == "NE":
+        return "SW"
+    if dir == "E":
+        return "W"
+    if dir == "SE":
+        return "NW"
+    if dir == "SW":
+        return "NE"
+    if dir == "W":
+        return "E"
+    if dir == "NW":
+        return "SE"
+
+
+
+# These gameplay objects are not yet set in stone
+
+def home_base(player, loc):
+    description = "Home base for player {}".format(player)
+    return Item(player, loc, description, "#")
+
+class Player:
+    def __init__(self, pieces, connection):
+        self.pieces = pieces
+        self.connection = connection
+        self.moves = []
+
+    def __repr__(self):
+        out = {}
+        out["type"] = "player"
+        out["pieces"] = self.pieces
+        return json.dump(out)
+
+class Item:
+    def __init__(self, owner, loc, description, ascii):
+        self.owner = owner
+        self.loc = loc
+        self.description = description
+        self.ascii = ascii
+
+    def __repr__(self):
+        out = {}
+        out["type"] = "base"
+        out["owner"] = self.owner
+        out['loc'] = self.loc
+        return json.dump(out)
+
+class Piece:
+    def __init__(self, owner, id, range, loc, cooldown=0):
+        self.range = range
+        self.id = id
+        self.cooldown = cooldown
+        self.owner = owner
+        loc.contents = self
+        self.loc = loc
+
+    def vision(self):
+        seen = set([self.loc])
+        to_check = set(self.loc.neighbors())
+        depth = self.range
+        while depth > 0:
+            new_nodes = set()
+            while len(to_check) > 0:
+                n = to_check.pop()
+                seen.add(n)
+                if n.contents == None:
+                    new_nodes = new_nodes.union(set(n.neighbors()))
+            # import pdb
+            # pdb.set_trace()
+            to_check = new_nodes - seen
+            depth -= 1
+        return seen
+
+    def __repr__(self):
+        out = {}
+        out['type'] = "piece"
+        out['range'] = self.range
+        out['id'] = self.id
+        out['cooldown'] = self.cooldown
+        out['owner'] = self.owner
+        out['loc'] = self.loc.coord
+        return json.dumps(out)
