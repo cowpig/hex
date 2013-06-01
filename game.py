@@ -15,6 +15,7 @@ import json, random
 # (0,2)(1,2)(2,2)(3,2)
 #   (0,3)(1,3)(2,3)(3,3)
 # (0,4)(1,4)(2,4)(3,4)
+# Which wraps around, so (3,4) is connected to 
 
 #
 # The [] operator is overloaded, so you can access a hex node the way you access
@@ -36,7 +37,9 @@ import json, random
 #   Out: {"neighbors": 5, "type": "node", "contents": null, "coord": [1, 2]}
 
 class Board:
-    # note: the home bases of each player will be 
+    # note: the home bases of each player will always be connected,
+    #   separated by half the minimum of the width and height of the
+    #   grid, and landlocked.
     def __init__(self, width, height):
         self.grid = []
         for x in xrange(width):
@@ -46,6 +49,7 @@ class Board:
             for y in range(len(self.grid[x])):
                 self.grid[x][y] = None
 
+        # Pick a node as the first node
         start = Node((random.randrange(width), random.randrange(height)))
         start.contents = home_base("player1", start)
         self[start.coord[0], start.coord[1]] = start
@@ -56,6 +60,8 @@ class Board:
         nodes_between_homes = min(height, width)/2
         random_dir = random.choice(start.dirs.keys())
         n = start
+
+        # Add nodes in a random direction until we reach the required distance
         for i in xrange(nodes_between_homes):
             new_coord = offset(n.coord, random_dir, width, height)
             new_node = Node(new_coord)
@@ -68,7 +74,6 @@ class Board:
             coastal.append(new_node)
             
             if i == nodes_between_homes - 1:
-                n.contents = home_base("player2", n)
                 self.home_nodes.append(n)
             
             n = new_node
@@ -101,6 +106,9 @@ class Board:
             if not n.landlocked():
                 coastal.append(new_node)
 
+            for node in self.home_nodes:
+                node.contents = Home(node)
+
     def __getitem__(self, coords):
         return self.grid[coords[0]][coords[1]]
 
@@ -122,7 +130,7 @@ class Board:
                 elif self.grid[x][y].contents == None:
                     out += "_{}".format(self.grid[x][y].num_neighbors())
                 else:
-                    out += "_{}".format(self.grid[x][y].contents.ascii)
+                    out += "_{}".format(self.grid[x][y].contents.id)
             out += '\n'
         return out
 
@@ -174,7 +182,7 @@ class Node:
         out['type'] = "node"
         out['coord'] = self.coord
         out['neighbors'] = self.num_neighbors()
-        out['contents'] = self.contents
+        out['contents'] = self.contents.id if self.contents != None else ""
         return json.dumps(out)
 
 #
@@ -240,18 +248,26 @@ def opposite(dir):
 # These gameplay objects are not yet set in stone
 
 class Game:
-    def __init__(self, board, player1, player2):
+    def __init__(self, board, players):
         self.board = board
-        self.player1 = player1
-        self.player2 = player2
-        self.move_numer = 0
+        # list of players, currently only supporting two
+        self.players = players
+        self.turn = 0
+        self.moves = []
+
+
+        # Create the starting pieces for each player
+        for i, player in enumerate(players):
+            board.home_base[i].owner = player
 
     def next_move(self):
-        pass
-        # move order phase
+        moves = self.moves[turn]
+        moves.update(player1.moves[turn])
+        moves.update(player2.moves[turn])
+
 
 class Player:
-    def __init__(self, pieces, connection):
+    def __init__(self, pieces, connection, id):
         # I'm not sure how this will work yet, but a Player object
         # should connect to an actual player
         self.connection = connection
@@ -259,6 +275,8 @@ class Player:
         self.moves = []
         # Set of Piece objects
         self.pieces = pieces
+        # id, usually 'A' or 'B'
+        self.id = id
 
     def __repr__(self):
         out = {}
@@ -266,23 +284,35 @@ class Player:
         out["pieces"] = self.pieces
         return json.dump(out)
 
-def home_base(player, loc):
-    description = "Home base for player {}".format(player)
-    return Item(player, loc, description, "#")
-
-class Item:
-    def __init__(self, owner, loc, description, ascii):
+class Home:
+    def __init__(self, loc, owner=None):
+        # player
         self.owner = owner
+        # node
         self.loc = loc
-        self.description = description
-        self.ascii = ascii
+        self.id = owner.id if owner != None else '#'
 
     def __repr__(self):
-        out = {}
-        out["type"] = "base"
-        out["owner"] = self.owner
-        out['loc'] = self.loc
-        return json.dump(out)
+        return "{}'s home".format(self.owner)
+
+
+# def home_base(player, loc):
+#     description = "Home base for player {}".format(player)
+#     return Item(player, loc, description, "#")
+
+# class Item:
+#     def __init__(self, owner, loc, description, ascii):
+#         self.owner = owner
+#         self.loc = loc
+#         self.description = description
+#         self.ascii = ascii
+
+#     def __repr__(self):
+#         out = {}
+#         out["type"] = "base"
+#         out["owner"] = self.owner
+#         out['loc'] = self.loc
+#         return json.dump(out)
 
 class Piece:
     def __init__(self, owner, id, range, loc, cooldown=0):
