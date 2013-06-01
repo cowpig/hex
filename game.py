@@ -1,8 +1,12 @@
 import json, random
 
+#
 # in general, 'loc' will refer to a node, while 'coord' will refer to an (x,y) tuple
 
+#
+# The __repr__ for every class is a json object string
 
+#
 # Game board.
 # Is a hexagonal grid, which can be accessed by (x, y) coordinates, arranged like so:
 # (0,0)(1,0)(2,0)(3,0)
@@ -11,9 +15,17 @@ import json, random
 #   (0,3)(1,3)(2,3)(3,3)
 # (0,4)(1,4)(2,4)(3,4)
 
+#
 # Each hex is managed by a Node object, which are effectively graph nodes which
 # can access one another via their .dirs dictionary, with capital letter directional
 # string as keys (e.g. "NE")
+
+#
+# The [] operator is overloaded, so you can access a hex node the way you access
+# matrix cells in numpy, for example:
+#   In:  b = Board(5,5)
+#   In:  b[2,2]
+#   Out: {"neighbors": 6, "type": "node", "contents": null, "coord": [5, 5]}
 
 class Board:
     # note: the home bases of each player will be 
@@ -32,7 +44,6 @@ class Board:
         self.nodes = [start]
         self.homenodes = [start]
         coastal = [start]
-        # self.log = []
 
         nodes_between_homes = min(height, width)/2
         random_dir = random.choice(start.dirs.keys())
@@ -75,10 +86,6 @@ class Board:
                 if other != None:
                     new_node.dirs[dir] = self.grid[x][y]
                     self.grid[x][y].dirs[opposite(dir)] = new_node
-                    # s = "connecting node {} at {} to node {} at {} | direction {}-{}".\
-                    # format(new_node, new_node.coord, self.grid[x][y], self.grid[x][y].coord\
-                    #     , dir, opposite(dir))
-                    # self.log.append(s)
 
             # put it on the grid
             self.grid[new_node.coord[0]][new_node.coord[1]] = new_node
@@ -86,6 +93,8 @@ class Board:
             if not n.landlocked():
                 coastal.append(new_node)
 
+    def __getitem__(self, coords):
+        return self.grid[coords[0]][coords[1]]
 
     def __repr__(self):
         out = '  '
@@ -129,6 +138,7 @@ class Node:
                 out.append(v)
         return out
 
+    # true if there are neighboring nodes in all 6 directions
     def landlocked(self):
         for d in self.dirs.values():
             if d == None:
@@ -150,6 +160,8 @@ class Node:
         out['contents'] = self.contents
         return json.dumps(out)
 
+#
+# Below are helper functions for the Board and Node classes
 
 # returns a grid coord (x, y) offset by one unit in the given direction
 def offset(coord, dir, xmax, ymax):
@@ -209,6 +221,17 @@ def opposite(dir):
 
 
 # These gameplay objects are not yet set in stone
+
+class Game:
+    def __init__(self, board, player1, player2):
+        self.board = board
+        self.player1 = player1
+        self.player2 = player2
+        self.move_numer = 0
+
+    def next_move(self):
+        pass
+        # move order phase
 
 def home_base(player, loc):
     description = "Home base for player {}".format(player)
