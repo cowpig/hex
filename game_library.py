@@ -138,12 +138,16 @@ class Board:
             if y%2==1:
                 out += ' '
             for x in xrange(len(self.grid)):
-                if self.grid[x][y] == None:
+                if self[x, y] == None:
                     out += "--"
-                elif self.grid[x][y].contents == None:
-                    out += "_{}".format(self.grid[x][y].num_neighbors())
+                elif self[x, y].contents == None:
+                    out += "_{}".format(self[x, y].num_neighbors())
                 else:
-                    out += "_{}".format(self.grid[x][y].contents.id)
+                    ascii = self[x, y].contents.id
+                    if len(ascii) == 1:
+                        out += "_{}".format(ascii)
+                    else:
+                        out += ascii[:2]
             out += '\n'
         return out
 
@@ -258,7 +262,7 @@ def opposite(dir):
 
 
 class Player:
-    def __init__(self, id, pieces=set(), connection=None):
+    def __init__(self, id, pieces, connection=None):
         # I'm not sure how this will work yet, but a Player object
         # should connect to an actual player
         self.connection = connection
@@ -318,18 +322,17 @@ class Piece:
         self.owner = owner
         owner.pieces.add(self)
         # Node in which the Piece currently is
-        print loc
         self.loc = loc
         loc.contents = self
         # Let that node know it's there
         loc.contents = self
 
-    def move(self, loc):
+    def goto(self, loc):
         if self.cooldown == 0:
-            cooldown += 1
+            self.cooldown += 1
 
         if not loc in self.vision():
-            cooldown += 1
+            self.cooldown += 1
             return "{} received a penalty of 1 for making an illegal move"
 
 
