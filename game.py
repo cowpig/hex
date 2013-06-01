@@ -1,5 +1,6 @@
 import json, random
 
+
 #
 # in general, 'loc' will refer to a node, while 'coord' will refer to an (x,y) tuple
 
@@ -16,16 +17,23 @@ import json, random
 # (0,4)(1,4)(2,4)(3,4)
 
 #
-# Each hex is managed by a Node object, which are effectively graph nodes which
-# can access one another via their .dirs dictionary, with capital letter directional
-# string as keys (e.g. "NE")
-
-#
 # The [] operator is overloaded, so you can access a hex node the way you access
 # matrix cells in numpy, for example:
-#   In:  b = Board(5,5)
-#   In:  b[2,2]
-#   Out: {"neighbors": 6, "type": "node", "contents": null, "coord": [5, 5]}
+#   In:  board = Board(5,5)
+#   In:  board[2,2]
+#   Out: {"neighbors": 6, "type": "node", "contents": null, "coord": [2, 2]}
+
+#
+# Each hex is managed by a Node object, which are effectively graph nodes which
+# can access one another via capital letter directional strings (e.g. "NE")
+
+#
+# The [] operator is also overloaded for Node objects, allowing access of nodes
+# like this:
+#   In:  board = Board(5,5)
+#   In:  node = board[2,2]
+#   In:  node["W"]
+#   Out: {"neighbors": 5, "type": "node", "contents": null, "coord": [1, 2]}
 
 class Board:
     # note: the home bases of each player will be 
@@ -40,9 +48,9 @@ class Board:
 
         start = Node((random.randrange(width), random.randrange(height)))
         start.contents = home_base("player1", start)
-        self.grid[start.coord[0]][start.coord[1]] = start
+        self[start.coord[0], start.coord[1]] = start
         self.nodes = [start]
-        self.homenodes = [start]
+        self.home_nodes = [start]
         coastal = [start]
 
         nodes_between_homes = min(height, width)/2
@@ -51,17 +59,17 @@ class Board:
         for i in xrange(nodes_between_homes):
             new_coord = offset(n.coord, random_dir, width, height)
             new_node = Node(new_coord)
-            n.dirs[random_dir] = new_node
-            new_node.dirs[opposite(random_dir)] = n
+            n[random_dir] = new_node
+            new_node[opposite(random_dir)] = n
 
 
-            self.grid[new_node.coord[0]][new_node.coord[1]] = new_node
+            self[new_node.coord[0], new_node.coord[1]] = new_node
             self.nodes.append(new_node)
             coastal.append(new_node)
             
             if i == nodes_between_homes - 1:
                 n.contents = home_base("player2", n)
-                self.homenodes.append(n)
+                self.home_nodes.append(n)
             
             n = new_node
 
@@ -81,20 +89,23 @@ class Board:
             # connect it to its neighbors
             for dir in new_node.dirs:
                 x, y = offset(new_coord, dir, width, height)
-                other = self.grid[x][y]
+                other = self[x, y]
 
                 if other != None:
-                    new_node.dirs[dir] = self.grid[x][y]
-                    self.grid[x][y].dirs[opposite(dir)] = new_node
+                    new_node[dir] = self[x, y]
+                    self[x, y][opposite(dir)] = new_node
 
             # put it on the grid
-            self.grid[new_node.coord[0]][new_node.coord[1]] = new_node
+            self[new_node.coord[0], new_node.coord[1]] = new_node
             self.nodes.append(new_node)
             if not n.landlocked():
                 coastal.append(new_node)
 
     def __getitem__(self, coords):
         return self.grid[coords[0]][coords[1]]
+
+    def __setitem__(self, coords, new_node):
+        self.grid[coords[0]][coords[1]] = new_node
 
     def __repr__(self):
         out = '  '
@@ -126,7 +137,7 @@ class Node:
     def empty_adj(self):
         out = []
         for d in self.dirs:
-            if self.dirs[d] == None:
+            if self[d] == None:
                 out.append(d)
         return out
 
@@ -151,6 +162,12 @@ class Node:
             if d != None:
                 i += 1
         return i
+
+    def __getitem__(self, dir):
+        return self.dirs[dir]
+
+    def __setitem__(self, dir, other_node):
+        self.dirs[dir] = other_node
 
     def __repr__(self):
         out = {}
@@ -233,21 +250,25 @@ class Game:
         pass
         # move order phase
 
-def home_base(player, loc):
-    description = "Home base for player {}".format(player)
-    return Item(player, loc, description, "#")
-
 class Player:
     def __init__(self, pieces, connection):
-        self.pieces = pieces
+        # I'm not sure how this will work yet, but a Player object
+        # should connect to an actual player
         self.connection = connection
+        # Each move is a Piece:Instruction dict
         self.moves = []
+        # Set of Piece objects
+        self.pieces = pieces
 
     def __repr__(self):
         out = {}
         out["type"] = "player"
         out["pieces"] = self.pieces
         return json.dump(out)
+
+def home_base(player, loc):
+    description = "Home base for player {}".format(player)
+    return Item(player, loc, description, "#")
 
 class Item:
     def __init__(self, owner, loc, description, ascii):
@@ -265,12 +286,27 @@ class Item:
 
 class Piece:
     def __init__(self, owner, id, range, loc, cooldown=0):
+        # Distance, in hexes, that this Piece can see or move
         self.range = range
+        # Identifying string
         self.id = id
+        # Turns until this Piece can move or spawn
         self.cooldown = cooldown
+        # Player that owns the Piece
         self.owner = owner
-        loc.contents = self
+        # Node in which the Piece currently is
         self.loc = loc
+        # Let that node know it's there
+        loc.contents = self
+
+    def move(self, loc):
+        if self.cooldown == 0:
+            cooldown += 1
+
+        if not loc in self.vision():
+            cooldown += 1
+            return "{} received a penalty of 1 for making an illegal move"
+
 
     def vision(self):
         seen = set([self.loc])
@@ -280,11 +316,10 @@ class Piece:
             new_nodes = set()
             while len(to_check) > 0:
                 n = to_check.pop()
-                seen.add(n)
-                if n.contents == None:
-                    new_nodes = new_nodes.union(set(n.neighbors()))
-            # import pdb
-            # pdb.set_trace()
+                if n != None:
+                    seen.add(n)
+                    if n.contents == None:
+                        new_nodes = new_nodes.union(set(n.neighbors()))
             to_check = new_nodes - seen
             depth -= 1
         return seen
