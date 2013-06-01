@@ -15,7 +15,7 @@ import json, random
 # (0,2)(1,2)(2,2)(3,2)
 #   (0,3)(1,3)(2,3)(3,3)
 # (0,4)(1,4)(2,4)(3,4)
-# Which wraps around, so (3,4) is connected to 
+# Which wraps around, so (3,4) is connected to (0,4) in the "E" direction, for example.
 
 #
 # The [] operator is overloaded, so you can access a hex node the way you access
@@ -51,7 +51,6 @@ class Board:
 
         # Pick a node as the first node
         start = Node((random.randrange(width), random.randrange(height)))
-        start.contents = home_base("player1", start)
         self[start.coord[0], start.coord[1]] = start
         self.nodes = [start]
         self.home_nodes = [start]
@@ -59,9 +58,13 @@ class Board:
 
         nodes_between_homes = min(height, width)/2
         random_dir = random.choice(start.dirs.keys())
-        n = start
+
+        print start
+        print nodes_between_homes
+        print random_dir
 
         # Add nodes in a random direction until we reach the required distance
+        n = start
         for i in xrange(nodes_between_homes):
             new_coord = offset(n.coord, random_dir, width, height)
             new_node = Node(new_coord)
@@ -73,13 +76,20 @@ class Board:
             self.nodes.append(new_node)
             coastal.append(new_node)
             
-            if i == nodes_between_homes - 1:
-                self.home_nodes.append(n)
-            
             n = new_node
+        
+        self.home_nodes.append(n)
+
+        for node in self.home_nodes:
+            # landlock the home nodes
+            for dir in node.dirs:
+                new_coord = offset(node.coord, dir, width, height)
+                if self[new_coord] == None:
+                    new_node = Node((new_coord))
+                    self.connect(new_node, width, height)
 
         for i in xrange(int((width*height)/1.5) - nodes_between_homes):
-            # find a coastal node to expand
+            # find a random coastal node to expand
             while True:
                 n = coastal[random.randrange(len(coastal))]
                 if not n.landlocked():
@@ -92,13 +102,7 @@ class Board:
             new_node = Node((new_coord))
 
             # connect it to its neighbors
-            for dir in new_node.dirs:
-                x, y = offset(new_coord, dir, width, height)
-                other = self[x, y]
-
-                if other != None:
-                    new_node[dir] = self[x, y]
-                    self[x, y][opposite(dir)] = new_node
+            self.connect(new_node, width, height)
 
             # put it on the grid
             self[new_node.coord[0], new_node.coord[1]] = new_node
@@ -108,6 +112,16 @@ class Board:
 
             for node in self.home_nodes:
                 node.contents = Home(node)
+
+    def connect(self, new_node, width, height):
+        # connect a node to its neighbors
+        for dir in new_node.dirs:
+            x, y = offset(new_node.coord, dir, width, height)
+            other = self[x, y]
+
+            if other != None:
+                new_node[dir] = self[x, y]
+                self[x, y][opposite(dir)] = new_node
 
     def __getitem__(self, coords):
         return self.grid[coords[0]][coords[1]]
