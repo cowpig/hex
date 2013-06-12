@@ -267,6 +267,8 @@ class Player:
         # should connect to an actual player
         self.connection = connection
         # Each move is a Piece:Instruction dict
+            # An instruction is a (string, loc) tuple,
+            # where the string can be "move" or "spawn"
         self.moves = []
         # Set of Piece objects
         self.pieces = pieces
@@ -327,13 +329,18 @@ class Piece:
         # Let that node know it's there
         loc.contents = self
 
-    def goto(self, loc):
-        if self.cooldown == 0:
-            self.cooldown += 1
-
+    def can_move_to(self, loc):
+        if self.cooldown != 0:
+            return False
+        
         if not loc in self.vision():
-            self.cooldown += 1
-            return "{} received a penalty of 1 for making an illegal move"
+            return False
+        
+        return True
+
+    def move_to(self, loc):
+        self.loc.contents.remove(self)
+        self.loc = loc
 
 
     def vision(self):
