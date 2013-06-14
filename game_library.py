@@ -266,12 +266,16 @@ class Player:
         # I'm not sure how this will work yet, but a Player object
         # should connect to an actual player
         self.connection = connection
-        # Each move is a Piece:Instruction dict
-            # An instruction is a (string, loc) tuple,
-            # where the string can be "move" or "spawn"
-        self.moves = []
+        
+        # This is a turn_number:move dict
+            # Each move is a Piece:Instruction dict
+                # An instruction is a (string, loc) tuple,
+                # where the string can be "move" or "spawn"
+        self.moves = {}
+
         # Set of Piece objects
         self.pieces = pieces
+
         # id, usually 'A' or 'B'
         self.id = id
 
@@ -316,16 +320,21 @@ class Piece:
     def __init__(self, owner, id, range, loc, cooldown=0):
         # Distance, in hexes, that this Piece can see or move
         self.range = range
+
         # Identifying string
         self.id = id
+
         # Turns until this Piece can move or spawn
         self.cooldown = cooldown
+
         # Player that owns the Piece
         self.owner = owner
         owner.pieces.add(self)
+
         # Node in which the Piece currently is
         self.loc = loc
         loc.contents = self
+        
         # Let that node know it's there
         loc.contents = self
 

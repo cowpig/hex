@@ -7,7 +7,7 @@ class Game:
         # list of players, currently only supporting two
         self.players = players
         self.turn = 0
-        self.moves = []
+        self.moves = {}
         self.illegal_move_penalty = 10
         self.movement_cooldown = 5
 
@@ -26,9 +26,14 @@ class Game:
         return (3+r) * 2
 
     def next_move(self):
-        moves = self.moves[self.turn]
-        moves.update(player1.moves[self.turn])
-        moves.update(player2.moves[self.turn])
+        player1, player2 = self.players
+        moves = {}
+        if self.turn in self.moves:
+            moves.update(self.moves[self.turn])
+        if self.turn in player1.moves:
+            moves.update(player1.moves[self.turn])
+        if self.turn in player2.moves:
+            moves.update(player2.moves[self.turn])
         
         for p, order in moves.iteritems():
             if order[0] == "move":
@@ -77,4 +82,13 @@ class Game:
 
 b = Board(40, 40)
 g = Game(b, [Player("A", set()), Player("B", set())])
+print b
+p1, p2 = g.players
+p1_moves = {}
+for piece in p1.pieces:
+    p1_moves[piece] = ("move", piece.loc["W"])
+
+p1.moves[0] = p1_moves
+
+g.next_move()
 print b
