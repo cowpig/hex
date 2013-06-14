@@ -107,7 +107,7 @@ class Board:
                 self.coastal.add(new_node)
 
         for node in self.home_nodes:
-            node.contents = Home(node)
+            node.contents.add(Home(node))
 
     def connect(self, new_node, width, height):
         # connect a node to its neighbors
@@ -140,10 +140,10 @@ class Board:
             for x in xrange(len(self.grid)):
                 if self[x, y] == None:
                     out += "--"
-                elif len(self[x, y].contents)==0:
+                elif self[x, y].contents.empty():
                     out += "_{}".format(self[x, y].num_neighbors())
                 else:
-                    ascii = self[x, y].contents[0].id
+                    ascii = self[x, y].contents.peek().id
                     if len(ascii) == 1:
                         out += "_{}".format(ascii)
                     else:
@@ -155,7 +155,7 @@ class Node:
     def __init__(self, coord, NE=None, E=None, SE=None, SW=None, W=None, NW=None):
         self.dirs = {"NE": NE, "E":E, "SE":SE, "SW":SW, "W":W, "NW":NW}
         self.coord = coord
-        self.contents = []
+        self.contents = PeekSet()
 
     # returns directions in which there are no neighbors.
     # used in building board
@@ -199,7 +199,7 @@ class Node:
         out['type'] = "node"
         out['coord'] = self.coord
         out['neighbors'] = self.num_neighbors()
-        out['contents'] = self.contents.id if self.contents != None else ""
+        out['contents'] = self.contents.peek().id if not self.contents.empty() else ""
         return json.dumps(out)
 
 #
@@ -260,6 +260,16 @@ def opposite(dir):
     if dir == "NW":
         return "SE"
 
+#
+# extension of the set class which has peek() and empty() functions
+class PeekSet(set):
+    def peek(self):
+        if len(self) == 0:
+            raise Exception("Cannot peek into an empty set")
+        return iter(self).next()
+
+    def empty(self):
+        return len(self) == 0
 
 class Player:
     def __init__(self, id, pieces, connection=None):
@@ -287,7 +297,7 @@ class Player:
         return json.dumps(out)
 
 
-class Item:
+class Item(object):
     def __init__(self, owner, loc, description):
         self.owner = owner
         self.loc = loc
@@ -333,10 +343,7 @@ class Piece:
 
         # Node in which the Piece currently is
         self.loc = loc
-        loc.contents = self
-        
-        # Let that node know it's there
-        loc.contents = self
+        loc.contents.add(self)
 
     def can_move_to(self, loc):
         if self.cooldown != 0:
@@ -362,7 +369,7 @@ class Piece:
                 n = to_check.pop()
                 if n != None:
                     seen.add(n)
-                    if n.contents == None:
+                    if n.contents.empty():
                         new_nodes = new_nodes.union(set(n.neighbors()))
             to_check = new_nodes - seen
             depth -= 1
