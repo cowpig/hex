@@ -11,10 +11,10 @@ class Game:
         self.illegal_move_penalty = 10
         self.movement_cooldown = 5
 
-        # Create the starting pieces for each player
         for i, player in enumerate(players):
-            # print player
+            # Set the home nodes for each player
             board.home_nodes[i].contents.set_owner(player)
+            # Create the starting pieces for each player
             for neighbor in board.home_nodes[i].dirs.values():
                 new_id = "{}{}".format(player.id, len(player.pieces))
                 p = Piece(player, new_id, 1, neighbor)

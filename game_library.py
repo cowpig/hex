@@ -140,10 +140,10 @@ class Board:
             for x in xrange(len(self.grid)):
                 if self[x, y] == None:
                     out += "--"
-                elif self[x, y].contents == None:
+                elif len(self[x, y].contents)==0:
                     out += "_{}".format(self[x, y].num_neighbors())
                 else:
-                    ascii = self[x, y].contents.id
+                    ascii = self[x, y].contents[0].id
                     if len(ascii) == 1:
                         out += "_{}".format(ascii)
                     else:
@@ -155,7 +155,7 @@ class Node:
     def __init__(self, coord, NE=None, E=None, SE=None, SW=None, W=None, NW=None):
         self.dirs = {"NE": NE, "E":E, "SE":SE, "SW":SW, "W":W, "NW":NW}
         self.coord = coord
-        self.contents = None
+        self.contents = []
 
     # returns directions in which there are no neighbors.
     # used in building board
@@ -377,3 +377,28 @@ class Piece:
         out['owner'] = self.owner.id
         out['loc'] = self.loc.coord
         return json.dumps(out)
+
+    def __del__(self):
+        self.owner.pieces.remove(self)
+        print "{} deleted".format(self.id)
+
+def spawn_time(piece):
+    return 5
+
+def combine(piece1, piece2, loc):
+    owner = piece1.owner
+    owner.pieces.remove(piece1)
+    owner.pieces.remove(piece2)
+
+    # find the lowest number ID we can assign to the new piece
+    existing_ids = [p.id for p in owner.pieces]
+    new_id = ""
+    i=0
+    while(True):
+        new_id = "{}{}".format(owner.id, i)
+        if new_id not in existing_ids:
+            break
+
+    new_range = piece1.range + piece2.range
+
+    Piece(owner, new_id, new_range, loc)
