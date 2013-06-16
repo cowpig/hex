@@ -289,6 +289,16 @@ class Player:
         # id, usually 'A' or 'B'
         self.id = id
 
+
+    def get_next_id(self):
+        current_ids = set([p.id for p in self.pieces])
+        
+        i = 0
+        while True:
+            if "{}{}".format(self.id, i) not in current_ids:
+                return "{}{}".format(self.id, i)
+            i += 1
+
     def __repr__(self):
         out = {}
         out["type"] = "player"

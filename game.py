@@ -16,7 +16,7 @@ class Game:
             board.home_nodes[i].contents.peek().set_owner(player)
             # Create the starting pieces for each player
             for neighbor in board.home_nodes[i].dirs.values():
-                new_id = "{}{}".format(player.id, len(player.pieces))
+                new_id = player.get_next_id()
                 p = Piece(player, new_id, 1, neighbor)
 
     def next_move(self):
@@ -44,7 +44,7 @@ class Game:
                 else:
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "new_piece":
-                new_id = p.get_next_id
+                new_id = p.get_next_id()
                 Piece(p, new_id, 1, order[1])
 
         for order, loc in moves.values():
@@ -67,7 +67,7 @@ class Game:
                     del item
             if new_range > 0:
                 p = owners.pop()
-                new_id = p.get_next_id
+                new_id = p.get_next_id()
                 Piece(p, new_id, new_range, loc, combine_time(new_range))
 
     def end_game(loser):
@@ -79,7 +79,6 @@ g = Game(b, [Player("A", set()), Player("B", set())])
 print b
 p1, p2 = g.players
 p1_moves = {}
-print p1.pieces
 for piece in p1.pieces:
     p1_moves[piece] = ("move", piece.loc["W"])
 
