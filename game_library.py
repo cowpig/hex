@@ -292,7 +292,7 @@ class Player:
 
     def get_next_id(self):
         current_ids = set([p.id for p in self.pieces])
-        
+
         i = 0
         while True:
             if "{}{}".format(self.id, i) not in current_ids:
@@ -306,28 +306,19 @@ class Player:
         out["id"] = self.id
         return json.dumps(out)
 
-
+# 
+# This represents any object that can appear within the "contents" of
+# a hex Node. All such classes are children of this class.
 class Item(object):
-    def __init__(self, owner, loc, description):
+    def __init__(self, loc, owner, id=""):
         self.owner = owner
         self.loc = loc
-        self.description = description
-        self.ascii = ascii
+        loc.contents.add(self)
+        self.id = id
 
-    def __repr__(self):
-        out = {}
-        out["type"] = "base"
-        out["owner"] = self.owner
-        out['loc'] = self.loc
-        return json.dumps(out)
-
-class Home:
+class Home(Item):
     def __init__(self, loc, owner=None):
-        # player
-        self.owner = owner
-        # node
-        self.loc = loc
-        self.id = owner.id if owner != None else '#'
+        super(Home, self).__init__(loc, owner, owner.id if owner != None else '#')
 
     def set_owner(self, player):
         self.owner = player
@@ -336,24 +327,17 @@ class Home:
     def __repr__(self):
         return "{}'s home".format(self.owner)
 
-class Piece:
-    def __init__(self, owner, id, range, loc, cooldown=0):
+class Piece(Item):
+    def __init__(self, loc, owner, id, range, cooldown=0):
+        super(Piece, self).__init__(loc, owner, id)
         # Distance, in hexes, that this Piece can see or move
         self.range = range
-
-        # Identifying string
-        self.id = id
 
         # Turns until this Piece can move or spawn
         self.cooldown = cooldown
 
-        # Player that owns the Piece
-        self.owner = owner
+        # Update the player object with this piece
         owner.pieces.add(self)
-
-        # Node in which the Piece currently is
-        self.loc = loc
-        loc.contents.add(self)
 
     def can_move_to(self, loc):
         if self.cooldown != 0:

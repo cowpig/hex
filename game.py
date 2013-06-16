@@ -17,7 +17,7 @@ class Game:
             # Create the starting pieces for each player
             for neighbor in board.home_nodes[i].dirs.values():
                 new_id = player.get_next_id()
-                p = Piece(player, new_id, 1, neighbor)
+                p = Piece(neighbor, player, new_id, 1)
 
     def next_move(self):
         player1, player2 = self.players
@@ -45,7 +45,7 @@ class Game:
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "new_piece":
                 new_id = p.get_next_id()
-                Piece(p, new_id, 1, order[1])
+                Piece(order[1], p, new_id, 1)
 
         for order, loc in moves.values():
             if len(loc.contents) > 1:
@@ -63,12 +63,12 @@ class Game:
             new_range = 0
             for item in loc.contents:
                 if type(item) == Piece:
-                    new_range += item.range() 
+                    new_range += item.range 
                     del item
             if new_range > 0:
                 p = owners.pop()
                 new_id = p.get_next_id()
-                Piece(p, new_id, new_range, loc, combine_time(new_range))
+                Piece(loc, p, new_id, new_range, cooldown=combine_time(new_range))
 
     def end_game(loser):
         pass
