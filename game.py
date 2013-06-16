@@ -52,23 +52,32 @@ class Game:
                 self.resolve(loc)
 
     def resolve(self, loc):
+        to_remove = set()
+        
         owners = set([item.owner for item in loc.contents])
         if len(owners) > 1:
             for item in loc.contents:
                 if type(item) == Home:
                     end_game(item.owner)
                 else:
-                    del item
+                    to_remove.add(item)
+            for item in to_remove:
+                item.remove()
         else:
             new_range = 0
             for item in loc.contents:
                 if type(item) == Piece:
                     new_range += item.range 
-                    del item
+                    to_remove.add(item)
+
+            for item in to_remove:
+                item.remove()
+
             if new_range > 0:
                 p = owners.pop()
                 new_id = p.get_next_id()
                 Piece(loc, p, new_id, new_range, cooldown=combine_time(new_range))
+                # print "piece {} created at ({},{}) with range {}".format(new_id, loc.coord[0], loc.coord[1], new_range)
 
     def end_game(loser):
         pass
@@ -79,10 +88,15 @@ g = Game(b, [Player("A", set()), Player("B", set())])
 print b
 p1, p2 = g.players
 p1_moves = {}
-for piece in p1.pieces:
-    p1_moves[piece] = ("move", piece.loc["W"])
+
+p1_moves[p1[0]] = ("move", p1[0].loc["NW"])
+p1_moves[p1[5]] = ("move", p1[5].loc["E"])
+p1_moves[p1[3]] = ("move", p1[3].loc["NE"])
+p1_moves[p1[4]] = ("move", p1[4].loc["W"])
 
 p1.moves[0] = p1_moves
 
 g.next_move()
 print b
+for piece in p1.pieces:
+    print piece

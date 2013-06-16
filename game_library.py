@@ -289,6 +289,28 @@ class Player:
         # id, usually 'A' or 'B'
         self.id = id
 
+    def __getitem__(self, arg):
+        if type(arg) == Node:
+            for piece in self.pieces:
+                if piece.loc == arg:
+                    return piece
+            raise KeyError("Player {} doesn't seem to have a piece "\
+                    "at location ({},{}).".format(self.id, *arg.coord))
+
+        if type(arg) == int:
+            arg = "{}{}".format(self.id, arg)
+
+        if type(arg) == str:
+            for piece in self.pieces:
+                if piece.id == arg:
+                    return piece
+            raise KeyError("Player {} doesn't seem to have a"\
+                    "pieces with id {}.".format(self.id, arg))
+
+        raise Exception("Attempted to call __getitem__ function of player {}" \
+                "with type {}".format(self.id, type(arg)))
+
+
 
     def get_next_id(self):
         current_ids = set([p.id for p in self.pieces])
@@ -316,6 +338,9 @@ class Item(object):
         loc.contents.add(self)
         self.id = id
 
+    def remove(self):
+        self.loc.contents.remove(self)
+
 class Home(Item):
     def __init__(self, loc, owner=None):
         super(Home, self).__init__(loc, owner, owner.id if owner != None else '#')
@@ -338,6 +363,10 @@ class Piece(Item):
 
         # Update the player object with this piece
         owner.pieces.add(self)
+
+    def remove(self):
+        self.owner.pieces.remove(self)
+        self.loc.contents.remove(self)
 
     def can_move_to(self, loc):
         if self.cooldown != 0:
@@ -380,9 +409,6 @@ class Piece(Item):
         out['loc'] = self.loc.coord
         return json.dumps(out)
 
-    def __del__(self):
-        self.owner.pieces.remove(self)
-        print "{} deleted".format(self.id)
 
 
 def combine(piece1, piece2, loc):
@@ -390,14 +416,7 @@ def combine(piece1, piece2, loc):
     owner.pieces.remove(piece1)
     owner.pieces.remove(piece2)
 
-    # find the lowest number ID we can assign to the new piece
-    existing_ids = [p.id for p in owner.pieces]
-    new_id = ""
-    i=0
-    while(True):
-        new_id = "{}{}".format(owner.id, i)
-        if new_id not in existing_ids:
-            break
+    new_id = owner.get_next_id()
 
     new_range = piece1.range + piece2.range
 
