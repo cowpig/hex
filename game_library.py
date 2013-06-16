@@ -357,6 +357,7 @@ class Piece:
     def move_to(self, loc):
         self.loc.contents.remove(self)
         self.loc = loc
+        loc.contents.add(self)
 
 
     def vision(self):
@@ -389,8 +390,6 @@ class Piece:
         self.owner.pieces.remove(self)
         print "{} deleted".format(self.id)
 
-def spawn_time(piece):
-    return 5
 
 def combine(piece1, piece2, loc):
     owner = piece1.owner
@@ -409,3 +408,9 @@ def combine(piece1, piece2, loc):
     new_range = piece1.range + piece2.range
 
     Piece(owner, new_id, new_range, loc)
+
+def spawn_time(r):
+    return sum([i*6 for i in range(r)])/2 + r + 5 
+
+def combine_time(r):
+    return (3+r) * 2

@@ -13,17 +13,11 @@ class Game:
 
         for i, player in enumerate(players):
             # Set the home nodes for each player
-            board.home_nodes[i].contents.set_owner(player)
+            board.home_nodes[i].contents.peek().set_owner(player)
             # Create the starting pieces for each player
             for neighbor in board.home_nodes[i].dirs.values():
                 new_id = "{}{}".format(player.id, len(player.pieces))
                 p = Piece(player, new_id, 1, neighbor)
-
-    def spawn_time(r):
-        return sum([i*6 for i in range(r)])/2 + r + 5 
-
-    def combine_time(r):
-        return (3+r) * 2
 
     def next_move(self):
         player1, player2 = self.players
@@ -44,7 +38,7 @@ class Game:
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "spawn":
                 if p.can_move_to(order[1]):
-                    p.cooldown = self.spawn_time(p.range)
+                    p.cooldown = spawn_time(p.range)
                     # only one piece can be created per player per turn
                     self.moves[self.turn+p.cooldown][p.owner] = ("new_piece", order[1])
                 else:
@@ -53,11 +47,11 @@ class Game:
                 new_id = p.get_next_id
                 Piece(p, new_id, 1, order[1])
 
-        for order, loc in moves.values:
+        for order, loc in moves.values():
             if len(loc.contents) > 1:
                 self.resolve(loc)
 
-    def resolve(loc):
+    def resolve(self, loc):
         owners = set([item.owner for item in loc.contents])
         if len(owners) > 1:
             for item in loc.contents:
@@ -74,7 +68,7 @@ class Game:
             if new_range > 0:
                 p = owners.pop()
                 new_id = p.get_next_id
-                Piece(p, new_id, new_range, loc, self.combine_time(new_range))
+                Piece(p, new_id, new_range, loc, combine_time(new_range))
 
     def end_game(loser):
         pass
@@ -85,6 +79,7 @@ g = Game(b, [Player("A", set()), Player("B", set())])
 print b
 p1, p2 = g.players
 p1_moves = {}
+print p1.pieces
 for piece in p1.pieces:
     p1_moves[piece] = ("move", piece.loc["W"])
 
