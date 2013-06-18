@@ -188,6 +188,33 @@ class Node:
                 i += 1
         return i
 
+    def dist(self, n):
+        if isinstance(n, Node):
+            target = n.coord
+        elif len(n) == 2:
+            target = n
+        else:
+            raise Exception("Must pass in a Node or coordinate pair.")
+        if self.coord == target:
+            return 0
+        distance = 1
+        to_check = set(self.neighbors())
+        checked_last = set()
+        while True:
+            next_to_check = []
+            for n in to_check:
+                if n.coord == target:
+                    return distance
+                next_to_check.extend(n.neighbors())
+
+            next_to_check = set(next_to_check) - to_check - checked_last
+            checked_last = to_check
+            to_check = next_to_check
+            distance += 1
+            if len(next_to_check) == 0:
+                return None
+
+
     def __getitem__(self, dir):
         return self.dirs[dir]
 
@@ -237,13 +264,6 @@ def offset(coord, dir, xmax, ymax):
             return (coord[0]%xmax, (coord[1]-1)%ymax)
         else:
             raise Exception("Must specify a valid direction.")
-
-        # "NE":(0,-1),\
-        # "E":(1,0),\
-        # "SE":(0,1),\
-        # "SW":(-1,1),\
-        # "W":(-1,0),\
-        # "NW":(-1,-1)}
 
 # returns the opposite of the given direction
 def opposite(dir):
@@ -389,12 +409,10 @@ class Piece(Item):
         depth = self.range
         while depth > 0:
             new_nodes = set()
-            while len(to_check) > 0:
-                n = to_check.pop()
-                if n != None:
-                    seen.add(n)
-                    if n.contents.empty():
-                        new_nodes = new_nodes.union(set(n.neighbors()))
+            for n in to_check:
+                seen.add(n)
+                if n.contents.empty():
+                    new_nodes.update(n.neighbors())
             to_check = new_nodes - seen
             depth -= 1
         return seen

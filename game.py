@@ -10,6 +10,8 @@ class Game:
         self.moves = {}
         self.illegal_move_penalty = 10
         self.movement_cooldown = 5
+        self.log_str = ""
+        self.log_to_terminal = False
 
         for i, player in enumerate(players):
             # Set the home nodes for each player
@@ -19,7 +21,13 @@ class Game:
                 new_id = player.get_next_id()
                 p = Piece(neighbor, player, new_id, 1)
 
+    def log(self, s):
+        if self.log_to_terminal:
+            print s
+        self.log_str += s + "\n" 
+
     def next_move(self):
+        self.log("\n=====TURN {}=====\n".format(self.turn))
         player1, player2 = self.players
         moves = {}
         if self.turn in self.moves:
@@ -30,13 +38,19 @@ class Game:
             moves.update(player2.moves[self.turn])
         
         for p, order in moves.iteritems():
+            self.log("Executing order:{}.{}({},{})".format(p.id, order[0], *order[1].coord))
             if order[0] == "move":
                 if p.can_move_to(order[1]):
                     p.move_to(order[1])
                     p.cooldown = self.movement_cooldown
+                    self.log("\t{}.cooldown = {}, moved to ({},{})"\
+                        .format(p.id, p.cooldown, *p.loc.coord))
                 else:
+                    self.log("\tIllegal move detected. {}.cooldown {}->{}"\
+                        .format(p.id, p.cooldown, p.cooldown+self.illegal_move_penalty))
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "spawn":
+                # TODO: I think this needs some improvement
                 if p.can_move_to(order[1]):
                     p.cooldown = spawn_time(p.range)
                     # only one piece can be created per player per turn
@@ -45,23 +59,49 @@ class Game:
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "new_piece":
                 new_id = p.get_next_id()
-                Piece(order[1], p, new_id, 1)
+                p_new = Piece(order[1], p, new_id, 1)
+                self.log("\t{} created at ({},{})".format(p_new.id, *p_new.loc.coord))
 
         for order, loc in moves.values():
             if len(loc.contents) > 1:
-                self.resolve(loc)
+                self.resolve(loc, moves)
 
-    def resolve(self, loc):
+        # decrement all the cooldowns
+        for piece in player1.pieces:
+            if piece.cooldown > 0 and piece not in moves:
+                piece.cooldown -= 1
+        for piece in player2.pieces:
+            if piece.cooldown > 0 and piece not in moves:
+                piece.cooldown -= 1
+
+        self.turn += 1
+
+    def resolve(self, loc, moves):
+        self.log("Resolving conflict at ({},{})".format(*loc.coord))
         to_remove = set()
         
         owners = set([item.owner for item in loc.contents])
-        if len(owners) > 1:
+        player1, player2 = self.players
+
+        if (player1 in owners) and (player2 in owners):
+            attackers = set()
             for item in loc.contents:
-                if type(item) == Home:
+                if isinstance(item, Home):
+                    self.log("Home base {} has been captured! "\
+                        "The game is over.".format(item))
                     end_game(item.owner)
-                else:
+                    return
+                if item in moves:
+                    self.log("\t{} moved this turn; {} is registered as an attacker"\
+                        .format(item.id, item.owner.id))
+                    attackers.add(item.owner)
+
+            for item in loc.contents:
+                if self.opponent(item.owner) in attackers:
                     to_remove.add(item)
+
             for item in to_remove:
+                self.log("\tremoving {} at ({},{})".format(item.id, *loc.coord))
                 item.remove()
         else:
             new_range = 0
@@ -71,13 +111,27 @@ class Game:
                     to_remove.add(item)
 
             for item in to_remove:
+                self.log("\tremoving {} at ({},{})".format(item.id, *loc.coord))
                 item.remove()
 
             if new_range > 0:
                 p = owners.pop()
                 new_id = p.get_next_id()
                 Piece(loc, p, new_id, new_range, cooldown=combine_time(new_range))
-                # print "piece {} created at ({},{}) with range {}".format(new_id, loc.coord[0], loc.coord[1], new_range)
+                self.log("\t{} with range {} created at ({},{})".\
+                    format(new_id, new_range, *loc.coord))
+
+    def opponent(self, player):
+        if isinstance(player, Item):
+            player = item.owner
+        if isinstance(player, Player):
+            if self.players[0] == player:
+                return self.players[1]
+            elif self.players[1] == player:
+                return self.players[0]
+            else:
+                raise Exception("Player {} is not in this game.".format(player.id))
+        raise TypeError("opponent(p) can take a Player or Item as a parameter.")
 
     def end_game(loser):
         pass
@@ -85,6 +139,7 @@ class Game:
 
 b = Board(40, 40)
 g = Game(b, [Player("A", set()), Player("B", set())])
+g.log_to_terminal = True
 print b
 p1, p2 = g.players
 p1_moves = {}
@@ -100,3 +155,30 @@ g.next_move()
 print b
 for piece in p1.pieces:
     print piece
+
+p1[0].move_to(p2[0].loc["E"]["E"])
+p1[3].move_to(p2[0].loc["NE"])
+
+while p1[0].cooldown != 0:
+    g.next_move()
+
+p1_moves = {}
+p2_moves = {}
+
+print p1[0].can_move_to(p2[2].loc)
+print p1[0].loc.dist(p2[2].loc)
+print ["{},{}".format(*n.coord) for n in p1[0].vision()]
+
+print ["{},{}".format(*n.coord) for n in p1[3].vision()]
+
+p1_moves[p1[0]] = ("move", p2[4].loc)
+p1_moves[p1[3]] = ("move", p2[0].loc["E"])
+p2_moves[p2[0]] = ("move", p2[0].loc["E"])
+
+p1.moves[g.turn] = p1_moves
+p2.moves[g.turn] = p2_moves
+
+g.next_move()
+print b
+
+
