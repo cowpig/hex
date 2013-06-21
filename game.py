@@ -55,6 +55,8 @@ class Game:
                 if p.can_move_to(order[1]):
                     p.cooldown = spawn_time(p.range)
                     # only one piece can be created per player per turn
+                    if self.turn+p.cooldown not in self.moves:
+                        self.moves[self.turn+p.cooldown] = {}
                     self.moves[self.turn+p.cooldown][p.owner] = ("new_piece", order[1])
                 else:
                     p.cooldown += self.illegal_move_penalty
@@ -186,10 +188,15 @@ import random
 while not g.game_over:
     for player in g.players:
         player.moves[g.turn] = {}
+        didspawn = False
         for piece in player.pieces:
             try:
+                if not didspawn:
+                    order = random.choice(['move', 'spawn'])
+                else:
+                    oder = 'move'
                 if piece.cooldown == 0:
-                    player.moves[g.turn][piece] = ('move', random.sample(piece.vision(),1)[0])
+                    player.moves[g.turn][piece] = (order, random.sample(piece.vision(),1)[0])
             except:
                 print piece.vision()
                 print random.sample(piece.vision(),1)

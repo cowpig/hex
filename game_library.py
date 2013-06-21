@@ -144,7 +144,11 @@ class Board:
                     # out += "_{}".format(self[x, y].num_neighbors())
                     out += "__"
                 else:
-                    ascii = self[x, y].contents.peek().id
+                    item = self[x,y].contents.peek()
+                    if isinstance(item, Piece):
+                        ascii = "{}{}".format(item.owner.id, item.range)
+                    else:
+                        ascii = item.id
                     if len(ascii) == 1:
                         out += "_{}".format(ascii)
                     else:
