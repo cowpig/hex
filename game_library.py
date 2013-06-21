@@ -141,7 +141,8 @@ class Board:
                 if self[x, y] == None:
                     out += "--"
                 elif self[x, y].contents.empty():
-                    out += "_{}".format(self[x, y].num_neighbors())
+                    # out += "_{}".format(self[x, y].num_neighbors())
+                    out += "__"
                 else:
                     ascii = self[x, y].contents.peek().id
                     if len(ascii) == 1:

@@ -12,6 +12,7 @@ class Game:
         self.movement_cooldown = 5
         self.log_str = ""
         self.log_to_terminal = False
+        self.game_over = False
 
         for i, player in enumerate(players):
             # Set the home nodes for each player
@@ -89,7 +90,7 @@ class Game:
                 if isinstance(item, Home):
                     self.log("Home base {} has been captured! "\
                         "The game is over.".format(item))
-                    end_game(item.owner)
+                    self.end_game(item.owner)
                     return
                 if item in moves:
                     self.log("\t{} moved this turn; {} is registered as an attacker"\
@@ -133,52 +134,66 @@ class Game:
                 raise Exception("Player {} is not in this game.".format(player.id))
         raise TypeError("opponent(p) can take a Player or Item as a parameter.")
 
-    def end_game(loser):
-        pass
+    def end_game(self, loser):
+        self.game_over = True
 
 
 b = Board(40, 40)
-g = Game(b, [Player("A", set()), Player("B", set())])
+g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
 g.log_to_terminal = True
 print b
 p1, p2 = g.players
-p1_moves = {}
+# p1_moves = {}
 
-p1_moves[p1[0]] = ("move", p1[0].loc["NW"])
-p1_moves[p1[5]] = ("move", p1[5].loc["E"])
-p1_moves[p1[3]] = ("move", p1[3].loc["NE"])
-p1_moves[p1[4]] = ("move", p1[4].loc["W"])
+# p1_moves[p1[0]] = ("move", p1[0].loc["NW"])
+# p1_moves[p1[5]] = ("move", p1[5].loc["E"])
+# p1_moves[p1[3]] = ("move", p1[3].loc["NE"])
+# p1_moves[p1[4]] = ("move", p1[4].loc["W"])
 
-p1.moves[0] = p1_moves
+# p1.moves[0] = p1_moves
 
-g.next_move()
-print b
-for piece in p1.pieces:
-    print piece
+# g.next_move()
+# print b
+# for piece in p1.pieces:
+#     print piece
 
-p1[0].move_to(p2[0].loc["E"]["E"])
-p1[3].move_to(p2[0].loc["NE"])
+# p1[0].move_to(p2[0].loc["E"]["E"])
+# p1[3].move_to(p2[0].loc["NE"])
 
-while p1[0].cooldown != 0:
+# while p1[0].cooldown != 0:
+#     g.next_move()
+
+# p1_moves = {}
+# p2_moves = {}
+
+# print p1[0].can_move_to(p2[2].loc)
+# print p1[0].loc.dist(p2[2].loc)
+# print ["{},{}".format(*n.coord) for n in p1[0].vision()]
+
+# print ["{},{}".format(*n.coord) for n in p1[3].vision()]
+
+# p1_moves[p1[0]] = ("move", p2[4].loc)
+# p1_moves[p1[3]] = ("move", p2[0].loc["E"])
+# p2_moves[p2[0]] = ("move", p2[0].loc["E"])
+
+# p1.moves[g.turn] = p1_moves
+# p2.moves[g.turn] = p2_moves
+
+# g.next_move()
+# print b
+from time import sleep
+import random
+while not g.game_over:
+    for player in g.players:
+        player.moves[g.turn] = {}
+        for piece in player.pieces:
+            try:
+                if piece.cooldown == 0:
+                    player.moves[g.turn][piece] = ('move', random.sample(piece.vision(),1)[0])
+            except:
+                print piece.vision()
+                print random.sample(piece.vision(),1)
+                print random.sample(piece.vision(),1)[0]
     g.next_move()
-
-p1_moves = {}
-p2_moves = {}
-
-print p1[0].can_move_to(p2[2].loc)
-print p1[0].loc.dist(p2[2].loc)
-print ["{},{}".format(*n.coord) for n in p1[0].vision()]
-
-print ["{},{}".format(*n.coord) for n in p1[3].vision()]
-
-p1_moves[p1[0]] = ("move", p2[4].loc)
-p1_moves[p1[3]] = ("move", p2[0].loc["E"])
-p2_moves[p2[0]] = ("move", p2[0].loc["E"])
-
-p1.moves[g.turn] = p1_moves
-p2.moves[g.turn] = p2_moves
-
-g.next_move()
-print b
-
-
+    print b
+    sleep(0.05)
