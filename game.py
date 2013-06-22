@@ -1,15 +1,16 @@
 from game_library import *
+import cPickle
 
 
 class Game:
-    def __init__(self, board, players):
+    def __init__(self, board, players, moves={}):
         self.board = board
         # list of players, currently only supporting two
         self.players = players
         self.turn = 0
-        self.moves = {}
-        self.illegal_move_penalty = 10
-        self.movement_cooldown = 5
+        self.moves = moves
+        self.illegal_move_penalty = 2
+        self.movement_cooldown = 3
         self.log_str = ""
         self.log_to_terminal = False
         self.game_over = False
@@ -38,6 +39,9 @@ class Game:
         if self.turn in player2.moves:
             moves.update(player2.moves[self.turn])
         
+        # Keep track of all moves so they can be saved to disk
+        self.moves[self.turn] = moves
+
         for p, order in moves.iteritems():
             self.log("Executing order:{}.{}({},{})".format(p.id, order[0], *order[1].coord))
             if order[0] == "move":
@@ -139,6 +143,23 @@ class Game:
     def end_game(self, loser):
         self.game_over = True
 
+    # Assuming no bugs, only the player IDs would have to be saved, rather than their
+        # entire moves dicts
+    def save_game(self, filename):
+        with open(filename, 'wb') as f:
+            cPickle.dump(f, [self.board, self.players, self.moves, self.turn])
+
+def load_game(filename, go_to_turn=False):
+    with open(filename, 'rb') as f:
+        board, players, moves, turn = cPickle.load(filename)
+    for player in players:
+        player.pieces = PeekSet()
+    game = Game(board, players, moves)
+    if go_to_turn:
+        for i in xrange(turn):
+            game.next_move()
+    return game
+
 
 b = Board(40, 40)
 g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
@@ -190,17 +211,12 @@ while not g.game_over:
         player.moves[g.turn] = {}
         didspawn = False
         for piece in player.pieces:
-            try:
                 if not didspawn:
                     order = random.choice(['move', 'spawn'])
                 else:
                     oder = 'move'
                 if piece.cooldown == 0:
                     player.moves[g.turn][piece] = (order, random.sample(piece.vision(),1)[0])
-            except:
-                print piece.vision()
-                print random.sample(piece.vision(),1)
-                print random.sample(piece.vision(),1)[0]
     g.next_move()
     print b
     sleep(0.05)
