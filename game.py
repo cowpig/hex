@@ -161,62 +161,74 @@ def load_game(filename, go_to_turn=False):
     return game
 
 
-b = Board(40, 40)
-g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
-g.log_to_terminal = True
-print b
-p1, p2 = g.players
-# p1_moves = {}
+def test_game():
+    b = Board(40, 40)
+    g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
+    g.log_to_terminal = True
+    print b
+    p1, p2 = g.players
 
-# p1_moves[p1[0]] = ("move", p1[0].loc["NW"])
-# p1_moves[p1[5]] = ("move", p1[5].loc["E"])
-# p1_moves[p1[3]] = ("move", p1[3].loc["NE"])
-# p1_moves[p1[4]] = ("move", p1[4].loc["W"])
+    p1_moves = {}
 
-# p1.moves[0] = p1_moves
+    p1_moves[p1[0]] = ("move", p1[0].loc["NW"])
+    p1_moves[p1[5]] = ("move", p1[5].loc["E"])
+    p1_moves[p1[3]] = ("move", p1[3].loc["NE"])
+    p1_moves[p1[4]] = ("move", p1[4].loc["W"])
 
-# g.next_move()
-# print b
-# for piece in p1.pieces:
-#     print piece
+    p1.moves[0] = p1_moves
 
-# p1[0].move_to(p2[0].loc["E"]["E"])
-# p1[3].move_to(p2[0].loc["NE"])
-
-# while p1[0].cooldown != 0:
-#     g.next_move()
-
-# p1_moves = {}
-# p2_moves = {}
-
-# print p1[0].can_move_to(p2[2].loc)
-# print p1[0].loc.dist(p2[2].loc)
-# print ["{},{}".format(*n.coord) for n in p1[0].vision()]
-
-# print ["{},{}".format(*n.coord) for n in p1[3].vision()]
-
-# p1_moves[p1[0]] = ("move", p2[4].loc)
-# p1_moves[p1[3]] = ("move", p2[0].loc["E"])
-# p2_moves[p2[0]] = ("move", p2[0].loc["E"])
-
-# p1.moves[g.turn] = p1_moves
-# p2.moves[g.turn] = p2_moves
-
-# g.next_move()
-# print b
-from time import sleep
-import random
-while not g.game_over:
-    for player in g.players:
-        player.moves[g.turn] = {}
-        didspawn = False
-        for piece in player.pieces:
-                if not didspawn:
-                    order = random.choice(['move', 'spawn'])
-                else:
-                    oder = 'move'
-                if piece.cooldown == 0:
-                    player.moves[g.turn][piece] = (order, random.sample(piece.vision(),1)[0])
     g.next_move()
     print b
-    sleep(0.05)
+    for piece in p1.pieces:
+        print piece
+
+    p1[0].move_to(p2[0].loc["E"]["E"])
+    p1[3].move_to(p2[0].loc["NE"])
+
+    while p1[0].cooldown != 0:
+        g.next_move()
+
+    p1_moves = {}
+    p2_moves = {}
+
+    print p1[0].can_move_to(p2[2].loc)
+    print p1[0].loc.dist(p2[2].loc)
+    print ["{},{}".format(*n.coord) for n in p1[0].vision()]
+
+    print ["{},{}".format(*n.coord) for n in p1[3].vision()]
+
+    p1_moves[p1[0]] = ("move", p2[4].loc)
+    p1_moves[p1[3]] = ("move", p2[0].loc["E"])
+    p2_moves[p2[0]] = ("move", p2[0].loc["E"])
+
+    p1.moves[g.turn] = p1_moves
+    p2.moves[g.turn] = p2_moves
+
+    g.next_move()
+    print b
+
+
+def random_game():
+    b = Board(40, 40)
+    g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
+    g.log_to_terminal = True
+    print b
+    p1, p2 = g.players
+    from time import sleep
+    import random
+    while not g.game_over:
+        for player in g.players:
+            player.moves[g.turn] = {}
+            didspawn = False
+            for piece in player.pieces:
+                    if not didspawn:
+                        order = random.choice(['move', 'spawn'])
+                    else:
+                        oder = 'move'
+                    if piece.cooldown == 0:
+                        player.moves[g.turn][piece] = (order, random.sample(piece.vision(),1)[0])
+        g.next_move()
+        print b
+        sleep(0.05)
+
+random_game()
