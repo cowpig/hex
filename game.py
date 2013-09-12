@@ -231,4 +231,4 @@ def random_game():
         print b
         sleep(0.05)
 
-random_game()
+# random_game()
