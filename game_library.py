@@ -302,7 +302,7 @@ class PeekSet(set):
         return len(self) == 0
 
 class Player:
-    def __init__(self, id, pieces, connection=None):
+    def __init__(self, id, pieces, connection=None, home_node=None):
         # I'm not sure how this will work yet, but a Player object
         # should connect to an actual player
         self.connection = connection
@@ -318,6 +318,10 @@ class Player:
 
         # id, usually 'A' or 'B'
         self.id = id
+
+        # atm I'm setting this after the player has already been constructed,
+        #  with Home.set_owner(player)
+        self.home_node=home_node
 
     def __getitem__(self, arg):
         if type(arg) == Node:
@@ -382,7 +386,11 @@ class Home(Item):
 
     def set_owner(self, player):
         self.owner = player
-        self.id = self.owner.id if self.owner != None else '#'
+        if self.owner != None:
+            self.id = self.owner.id
+            self.owner.home_node = self.loc
+        else:
+            self.id = '#'
 
     def __repr__(self):
         return "{}'s home".format(self.owner)
