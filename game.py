@@ -207,9 +207,10 @@ def test_game():
     g.next_move()
     print b
 
-
-def random_game():
-    b = Board(40, 40)
+# both players move completely randomly
+def random_game(store_gamelog=False):
+    gamelog = []
+    b = Board(20, 20)
     g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
     g.log_to_terminal = True
     print b
@@ -229,6 +230,43 @@ def random_game():
                         player.moves[g.turn][piece] = (order, random.sample(piece.vision(),1)[0])
         g.next_move()
         print b
+        gamelog.append([n.gui_output() for n in b.nodes])
         sleep(0.05)
 
-# random_game()
+    if store_gamelog:
+        with open("demo_log.txt", "wb") as f:
+            f.write(json.dumps(gamelog))
+
+def dumb_game(store_gamelog=False):
+    gamelog = []
+    b = Board(20, 20)
+    g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
+    g.log_to_terminal = True
+    print b
+    p1, p2 = g.players
+    from time import sleep
+    import random
+    while not g.game_over:
+        for player in g.players:
+            player.moves[g.turn] = {}
+            didspawn = False
+            for piece in player.pieces:
+                    if not didspawn:
+                        order = random.choice(['move', 'spawn'])
+                    else:
+                        oder = 'move'
+                    if piece.cooldown == 0:
+                        for node in b.home_nodes:
+                            if node.contents.peek().owner == player and node in piece.vision():
+                                player.moves[g.turn][piece] = (order, node)
+                        player.moves[g.turn][piece] = (order, random.sample(piece.vision(),1)[0])
+        g.next_move()
+        print b
+        gamelog.append([n.gui_output() for n in b.nodes])
+        sleep(0.05)
+
+    if store_gamelog:
+        with open("demo_log.txt", "wb") as f:
+            f.write(json.dumps(gamelog))
+
+dumb_game(True)

@@ -219,6 +219,11 @@ class Node:
             if len(next_to_check) == 0:
                 return None
 
+    def gui_output(self):
+        out = {}
+        out['coord'] = self.coord
+        out['id'] = self.contents.peek().id if not self.contents.empty() else ""
+        return out
 
     def __getitem__(self, dir):
         return self.dirs[dir]
@@ -335,6 +340,11 @@ class Player:
         raise Exception("Attempted to call __getitem__ function of player {}" \
                 "with type {}".format(self.id, type(arg)))
 
+    def vision(self):
+        out = set()
+        for piece in self.pieces:
+            out += piece.vision()
+        return out
 
 
     def get_next_id(self):

@@ -105,7 +105,14 @@ Hex.Hexagon.prototype.draw = function(ctx) {
 	if(this.Id)
 	{
 		//draw text for debugging
-		ctx.fillStyle = "black"
+		if (this.Id.charAt(0) == "A")
+			ctx.fillStyle = "blue"
+		if (this.Id.charAt(0) == "B")
+			ctx.fillStyle = "orange"
+		else
+			ctx.fillStyle = "black"
+
+		
 		ctx.font = "bolder 8pt Trebuchet MS,Tahoma,Verdana,Arial,sans-serif";
 		ctx.textAlign = "center";
 		ctx.textBaseline = 'middle';
@@ -208,82 +215,13 @@ Hex.Hexagon.prototype.Contains = function(/*Point*/ p) {
 	}
 	return isIn;
 };
-	var input = [{"neighbors": 4, "type": "node", "contents": "", "coord": [3, 8]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 6]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [1, 2]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [8, 1]},
-     {"neighbors": 2, "type": "node", "contents": "", "coord": [6, 4]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 6]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [8, 9]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [4, 3]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [3, 7]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [6, 9]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [2, 1]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 7]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [8, 5]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 5]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 7]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [2, 0]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 0]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 8]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [6, 2]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [3, 1]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [8, 7]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 5]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [6, 5]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [2, 9]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 6]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 6]},
-     {"neighbors": 1, "type": "node", "contents": "", "coord": [7, 2]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [7, 5]},
-     {"neighbors": 6, "type": "node", "contents": "#", "coord": [2, 3]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [8, 8]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 2]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [4, 4]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 1]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [5, 2]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [7, 7]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 0]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [3, 5]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [7, 8]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [4, 1]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 9]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [8, 6]},
-     {"neighbors": 6, "type": "node", "contents": "#", "coord": [0, 8]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [6, 8]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [4, 2]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [3, 3]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 0]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 4]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [3, 6]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [0, 2]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [6, 7]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [3, 2]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 1]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [1, 3]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [8, 0]},
-     {"neighbors": 3, "type": "node", "contents": "", "coord": [0, 4]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [3, 4]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 5]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [1, 4]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 8]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [7, 9]},
-     {"neighbors": 4, "type": "node", "contents": "", "coord": [5, 3]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 9]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [7, 6]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 7]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [9, 5]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 8]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 9]},
-     {"neighbors": 5, "type": "node", "contents": "", "coord": [9, 1]},
-     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 7]}];
 
-function drawHexGrid()
-{
-	var num_x = 10;
-	var num_y = 10;
-	var width = 60;
-	var height = 60;
+var drawHexGrid = function()
+{	
+	var num_x = 20;
+	var num_y = 20;
+	var width = 40;
+	var height = 40;
 
 
 	//solve quadratic
@@ -315,4 +253,12 @@ function drawHexGrid()
 		console.log("(" + xpos + ", " + ypos + ")");
 		new Hex.Hexagon(id, xpos, ypos, width, height, z).draw(ctx);
 	}
+}
+
+function demo() {
+	var i = 0;
+	var nextTurn = function(){
+		drawHexGrid(input[i])
+	}
+	setInterval(nextTurn,300);
 }
