@@ -1,7 +1,7 @@
 // This is all adapted from a script found at:
 // http://www.mattpalmerlee.com/2012/04/05/fun-with-hexagon-math-for-games/
 
-var HT = HT || {};
+var Hex = Hex || {};
 /**
  * A Point is simply x and y coordinates
  * @constructor
@@ -33,19 +33,24 @@ Hex.Line = function(x1, y1, x2, y2) {
 	this.Y2 = y2;
 };
 
+// determines the side length of a hexagon, given its height and width
+Hex.get_z = function(width, height) {
+}
+
 /**
  * A Hexagon is a 6 sided polygon, our hexes don't have to be symmetrical, i.e. ratio of width to height could be 4 to 3
  * @constructor
  */
-Hex.Hexagon = function(id, x, y, width, height) {
-	var y = height/2.0;
-	
-	//solve quadratic
-	var a = -3.0;
-	var b = (-2.0 * width);
-	var c = (Math.pow(width, 2)) + (Math.pow(height, 2));
-	
-	var z = (-b - Math.sqrt(Math.pow(b,2)-(4.0*a*c)))/(2.0*a);
+Hex.Hexagon = function(id, xpos, ypos, width, height, z) {
+
+	console.log(id + "," + xpos + "," + ypos + "," + width + "," + height + "," + z)
+
+	var x = xpos * width;
+	if (ypos % 2 === 1)
+		x += width / 2;
+	var y = ypos * (height - (height-z)/2);
+
+	console.log("creating hex at (" + x + ", " + y + ")");
 
 	this.Points = [];//Polygon Base
 	var x1 = null;
@@ -203,15 +208,111 @@ Hex.Hexagon.prototype.Contains = function(/*Point*/ p) {
 	}
 	return isIn;
 };
+	var input = [{"neighbors": 4, "type": "node", "contents": "", "coord": [3, 8]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 6]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [1, 2]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [8, 1]},
+     {"neighbors": 2, "type": "node", "contents": "", "coord": [6, 4]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 6]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [8, 9]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [4, 3]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [3, 7]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [6, 9]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [2, 1]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 7]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [8, 5]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 5]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 7]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [2, 0]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 0]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 8]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [6, 2]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [3, 1]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [8, 7]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 5]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [6, 5]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [2, 9]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 6]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 6]},
+     {"neighbors": 1, "type": "node", "contents": "", "coord": [7, 2]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [7, 5]},
+     {"neighbors": 6, "type": "node", "contents": "#", "coord": [2, 3]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [8, 8]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 2]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [4, 4]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 1]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [5, 2]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [7, 7]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 0]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [3, 5]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [7, 8]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [4, 1]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 9]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [8, 6]},
+     {"neighbors": 6, "type": "node", "contents": "#", "coord": [0, 8]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [6, 8]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [4, 2]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [3, 3]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 0]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [2, 4]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [3, 6]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [0, 2]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [6, 7]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [3, 2]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 1]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [1, 3]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [8, 0]},
+     {"neighbors": 3, "type": "node", "contents": "", "coord": [0, 4]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [3, 4]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 5]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [1, 4]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 8]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [7, 9]},
+     {"neighbors": 4, "type": "node", "contents": "", "coord": [5, 3]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 9]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [7, 6]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [0, 7]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [9, 5]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 8]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [1, 9]},
+     {"neighbors": 5, "type": "node", "contents": "", "coord": [9, 1]},
+     {"neighbors": 6, "type": "node", "contents": "", "coord": [9, 7]}];
 
 function drawHexGrid()
 {
-	var grid = new Grid(800, 600);
+	var num_x = 10;
+	var num_y = 10;
+	var width = 60;
+	var height = 60;
+
+
+	//solve quadratic
+	var a = -3.0;
+	var b = (-2.0 * width);
+	var c = (Math.pow(width, 2)) + (Math.pow(height, 2));
+	var z = (-b - Math.sqrt(Math.pow(b,2)-(4.0*a*c)))/(2.0*a);
+
+
+	var total_width = (num_x + 0.5) * width;
+	var total_height = num_y * (height - (height-z)/2);
+
 	var canvas = document.getElementById("hexCanvas");
 	var ctx = canvas.getContext('2d');
-	ctx.clearRect(0, 0, 800, 600);
-	for(var h in grid.Hexes)
+	ctx.fillstyle = "black";
+	ctx.clearRect(0, 0, total_width, total_height);
+
+	for (var i=0; i<input.length; i++)
 	{
-		grid.Hexes[h].draw(ctx);
+		var node = input[i];
+		console.log(JSON.stringify(node));
+		xpos = node.coord[0];
+		ypos = node.coord[1];
+		if (node.contents != "")
+			var id = node.contents;
+		else
+			var id = "";
+			// var id = "(" + xpos + ", " + ypos + ")";
+		console.log("(" + xpos + ", " + ypos + ")");
+		new Hex.Hexagon(id, xpos, ypos, width, height, z).draw(ctx);
 	}
 }

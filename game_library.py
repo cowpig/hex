@@ -242,30 +242,30 @@ def offset(coord, dir, xmax, ymax):
     if coord[1] % 2 == 0:
         if dir == "NE":
             return ((coord[0])%xmax, (coord[1]-1)%ymax)
-        if dir == "E":
+        elif dir == "E":
             return ((coord[0]+1)%xmax, coord[1]%ymax)
-        if dir == "SE":
+        elif dir == "SE":
             return ((coord[0])%xmax, (coord[1]+1)%ymax)
-        if dir == "SW":
+        elif dir == "SW":
             return ((coord[0]-1)%xmax, (coord[1]+1)%ymax)
-        if dir == "W":
+        elif dir == "W":
             return ((coord[0]-1)%xmax, coord[1])
-        if dir == "NW":
+        elif dir == "NW":
             return ((coord[0]-1)%xmax, (coord[1]-1)%ymax)
         else:
             raise Exception("Must specify a valid direction.")
     else:
         if dir == "NE":
             return ((coord[0]+1)%xmax, (coord[1]-1)%ymax)
-        if dir == "E":
+        elif dir == "E":
             return ((coord[0]+1)%xmax, coord[1]%ymax)
-        if dir == "SE":
+        elif dir == "SE":
             return ((coord[0]+1)%xmax, (coord[1]+1)%ymax)
-        if dir == "SW":
+        elif dir == "SW":
             return ((coord[0])%xmax, (coord[1]+1)%ymax)
-        if dir == "W":
+        elif dir == "W":
             return ((coord[0]-1)%xmax, coord[1])
-        if dir == "NW":
+        elif dir == "NW":
             return (coord[0]%xmax, (coord[1]-1)%ymax)
         else:
             raise Exception("Must specify a valid direction.")
