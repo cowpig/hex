@@ -149,6 +149,16 @@ class Game:
 		with open(filename, 'wb') as f:
 			cPickle.dump(f, [self.board, self.players, self.moves, self.turn])
 
+	def gui_output(self, node):
+		out = {}
+		out['coord'] = node.coord
+		out['id'] = node.contents.peek().demo_id() if not node.contents.empty() else ""
+		out['vis'] = ""
+		for player in self.players:
+			if node in player.vision():
+				out['vis'] += player.id
+		return out
+
 def load_game(filename, go_to_turn=False):
 	with open(filename, 'rb') as f:
 		board, players, moves, turn = cPickle.load(filename)
@@ -237,6 +247,7 @@ def random_game(store_gamelog=False):
 		gamelog.append([n.gui_output() for n in b.nodes])
 		sleep(0.05)
 
+	gamelog.append([n.gui_output() for n in b.nodes])
 	if store_gamelog:
 		with open("demo_log.txt", "wb") as f:
 			f.write(json.dumps(gamelog))
@@ -253,12 +264,12 @@ def make_nearly_random_moves(player, game, board):
 			oder = 'move'
 		if piece.cooldown == 0:
 			if game.opponent(player).home_node in piece.vision():
-				player.moves[game.turn][piece] = (order, game.opponent(player).home_node)
+				player.moves[game.turn][piece] = ("move", game.opponent(player).home_node)
 				moved = True
 				print 'FOUND IT'
 			else:
 				candidates = piece.vision() - set(board.home_nodes)
-				player.moves[game.turn][piece] = (order, random.sample(candidates,1)[0])
+				player.moves[game.turn][piece] = ("move", random.sample(candidates,1)[0])
 				moved = True
 	return moved
 
@@ -280,7 +291,7 @@ def dumb_game(store_gamelog=False):
 		g.next_move()
 		print b
 		if moved and lines_logged < 20:
-			gamelog.append([n.gui_output() for n in b.nodes])
+			gamelog.append([g.gui_output(n) for n in b.nodes])
 		sleep(0.05)
 
 	if store_gamelog:
