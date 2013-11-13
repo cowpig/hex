@@ -4,7 +4,7 @@ import cPickle
 
 class Game:
 	def __init__(self, 
-				board=Board(50,50), 
+				board=Board(20,20), 
 				players=[Player("A", PeekSet()), Player("B", PeekSet())], 
 				moves={}):
 		self.board = board
@@ -152,7 +152,7 @@ class Game:
 		with open(filename, 'wb') as f:
 			cPickle.dump(f, [self.board, self.players, self.moves, self.turn])
 
-	def gui_output(self, node):
+	def gui_output_for_node(self, node):
 		out = {}
 		out['coord'] = node.coord
 		out['id'] = node.contents.peek().demo_id() if not node.contents.empty() else ""
@@ -161,6 +161,9 @@ class Game:
 			if node in player.vision():
 				out['vis'] += player.id
 		return out
+
+	def gui_output(self):
+		return json.dumps([self.gui_output_for_node(n) for n in self.board.nodes], separators=(',',':'))
 
 def load_game(filename, go_to_turn=False):
 	with open(filename, 'rb') as f:
@@ -228,7 +231,7 @@ def make_random_moves(player, game):
 			order = random.choice(['move', 'spawn'])
 			didspawn = True
 		else:
-			oder = 'move'
+			order = 'move'
 		if piece.cooldown == 0:
 			player.moves[game.turn][piece] = (order, random.sample(piece.vision(),1)[0])
 
@@ -264,7 +267,7 @@ def make_nearly_random_moves(player, game, board):
 			order = random.choice(['move', 'spawn'])
 			didspawn = True
 		else:
-			oder = 'move'
+			order = 'move'
 		if piece.cooldown == 0:
 			if game.opponent(player).home_node in piece.vision():
 				player.moves[game.turn][piece] = ("move", game.opponent(player).home_node)

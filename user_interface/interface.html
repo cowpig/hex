@@ -1,13 +1,14 @@
 <!DOCTYPE html>  
 <meta charset="utf-8" />  
 <title>WebSocket Test</title>  
+<script type="text/javascript" src="js/HexagonTools.js"></script>
 <script language="javascript" type="text/javascript">
 
 	var wsUri = "ws://localhost:8000/ws";
 	var websocket = new WebSocket(wsUri);
-	var output;
+	var statusBar;
 	function init() { 
-		output = document.getElementById("outputDiv");
+		statusBar = document.getElementById("statusDiv");
 		if (!'WebSocket' in window){
 			writeToScreen('<span style="color: red;">ERROR: Update your browser to one that supports websockets. A list can be found <a href="http://caniuse.com/websockets">here</a></span>');
 		} else {
@@ -16,26 +17,15 @@
 	}
 	function onOpen(evt) { 
 		writeToScreen("CONNECTED");
-		doSend("Hi there!");
 	}
 	function onClose(evt) { 
 		writeToScreen("DISCONNECTED");
 	}
-	function onMessage(evt) { 
-		writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+	function onMessage(evt) {
+		drawHexGrid(evt.data, 20, 20, 40, 40);
 	}
 	function onError(evt) { 
 		writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-	}
-	function doSend(message) { 
-		writeToScreen("SENT: " + message);
-	 	websocket.send(message);
-	}
-	function writeToScreen(message) { 
-		var pre = document.createElement("p");
-		pre.style.wordWrap = "break-word";
-		pre.innerHTML = message;
-		output.appendChild(pre);
 	}
 	function testWebSocket() {
 		websocket.onopen = function(evt) { onOpen(evt) };
@@ -43,20 +33,29 @@
 		websocket.onmessage = function(evt) { onMessage(evt) };
 		websocket.onerror = function(evt) { onError(evt) };
 		document.getElementById("send").onclick = function () {
-			doSend(document.getElementById("inputTxt").value);
+			websocket.send(document.getElementById("inputTxt").value);
 			console.log("click registered.");
 		};
 
+	}
+	function writeToScreen(message) { 
+		statusBar.innerHTML = message;
 	}
 	window.addEventListener("load", init, false);
 </script>  
 </div>
 <h2>WebSocket Test</h2> 
+<div id="statusDiv">
+</div>
+<br>
 <div id="inputDiv">
 	<textarea id="inputTxt" cols="80" rows="10"></textarea>
 	<br>
-	<button id="send" onclick=>send</button>
+	<button id="send" onclick=>send instructions</button>
 </div>
-<div id="outputDiv">
+<div id="canvasDiv">
+	<center>
+	<canvas id="hexCanvas" width="900" height="900" style="width:900px;height:900px" />
+	</center>
 </div>
 </html>

@@ -7,8 +7,8 @@ from game_api import GameApi
 class WSHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print 'new connection'
-        self.write_message("Hello World")
         self.api = GameApi(self.write_message)
+        self.write_message(self.api.game.gui_output())
       
     def on_message(self, message):
         print 'message received %s' % message
