@@ -5,7 +5,10 @@ class GameApi(object):
 		self.send = msgfunc
 
 	def repl(self, x):
-		exec x
+		try:
+			exec x
+		except Exception as e:
+			self.send("Error caught: %s" % e.message)
 
 	def new_game(self, *args):
 		self.game = Game(*args)
