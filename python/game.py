@@ -3,7 +3,10 @@ import cPickle
 
 
 class Game:
-	def __init__(self, board, players, moves={}):
+	def __init__(self, 
+				board=Board(50,50), 
+				players=[Player("A", PeekSet()), Player("B", PeekSet())], 
+				moves={}):
 		self.board = board
 		# list of players, currently only supporting two
 		self.players = players
@@ -173,7 +176,7 @@ def load_game(filename, go_to_turn=False):
 
 def test_game():
 	b = Board(40, 40)
-	g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
+	g = Game(b)
 	g.log_to_terminal = True
 	print b
 	p1, p2 = g.players
@@ -300,4 +303,5 @@ def dumb_game(store_gamelog=False):
 			f.write(json.dumps(gamelog))
 			f.write(";")
 
-dumb_game(True)
+if __name__ == "__main__":
+	dumb_game(True)

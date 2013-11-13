@@ -1,23 +1,22 @@
 <!DOCTYPE html>  
 <meta charset="utf-8" />  
 <title>WebSocket Test</title>  
-<script language="javascript" type="text/javascript">  
-	var wsUri = "ws://localhost:8000";
+<script language="javascript" type="text/javascript">
+
+	var wsUri = "ws://localhost:8000/ws";
 	var output;
+	var websocket;
 	function init() { 
-		output = document.getElementById("output");
-		testWebSocket();
-	}
-	function testWebSocket() { 
-		websocket = new WebSocket(wsUri);
-		websocket.onopen = function(evt) { onOpen(evt) };
-		websocket.onclose = function(evt) { onClose(evt) };
-		websocket.onmessage = function(evt) { onMessage(evt) };
-		websocket.onerror = function(evt) { onError(evt) };
+		output = document.getElementById("outputDiv");
+		if (!'WebSocket' in window){
+			writeToScreen('<span style="color: red;">ERROR: Update your browser to one that supports websockets. A list can be found <a href="http://caniuse.com/websockets">here</a></span>');
+		} else {
+			testWebSocket();
+		}
 	}
 	function onOpen(evt) { 
 		writeToScreen("CONNECTED");
-		doSend("WebSocket rocks");
+		doSend("Hi there!");
 	}
 	function onClose(evt) { 
 		writeToScreen("DISCONNECTED");
@@ -39,8 +38,26 @@
 		pre.innerHTML = message;
 		output.appendChild(pre);
 	}
+	function testWebSocket() { 
+		websocket = new WebSocket(wsUri);
+		websocket.onopen = function(evt) { onOpen(evt) };
+		websocket.onclose = function(evt) { onClose(evt) };
+		websocket.onmessage = function(evt) { onMessage(evt) };
+		websocket.onerror = function(evt) { onError(evt) };
+		document.getElementById("send").onclick = function () {
+			doSend(document.getElementById("inputTxt").value);
+			console.log("click registered.");
+		};
+
+	}
 	window.addEventListener("load", init, false);
-	</script>  
-<h2>WebSocket Test</h2>  
-<div id="output"></div>
+</script>  
+</div>
+<h2>WebSocket Test</h2> 
+<div id="inputDiv">
+	<input id="inputTxt" type="text"/>
+	<button id="send" onclick=>send</button>
+</div>
+<div id="outputDiv">
+</div>
 </html>
