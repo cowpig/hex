@@ -9,6 +9,7 @@ class GameApi(object):
 		try:
 			exec msg
 		except Exception as e:
+			print e.message
 			self.send("Error caught: %s" % e.message)
 			
 		self.send(self.game.gui_output())

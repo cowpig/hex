@@ -1,38 +1,36 @@
 from game_library import *
 import cPickle
+import logging
 
 
 class Game:
 	def __init__(self, 
-				board=Board(20,20), 
+				board=None, 
 				players=[Player("A", PeekSet()), Player("B", PeekSet())], 
 				moves={}):
-		self.board = board
+		logging.info("constructor called")
+		if board == None:
+			self.board = Board(20,20)
+		else:
+			self.board = board
 		# list of players, currently only supporting two
 		self.players = players
 		self.turn = 0
 		self.moves = moves
 		self.illegal_move_penalty = 2
 		self.movement_cooldown = 3
-		self.log_str = ""
-		self.log_to_terminal = False
 		self.game_over = False
 
 		for i, player in enumerate(players):
 			# Set the home nodes for each player
-			board.home_nodes[i].contents.peek().set_owner(player)
+			self.board.home_nodes[i].contents.peek().set_owner(player)
 			# Create the starting pieces for each player
-			for neighbor in board.home_nodes[i].dirs.values():
+			for neighbor in self.board.home_nodes[i].dirs.values():
 				new_id = player.get_next_id()
 				p = Piece(neighbor, player, new_id, 1)
 
-	def log(self, s):
-		if self.log_to_terminal:
-			print s
-		self.log_str += s + "\n" 
-
 	def next_move(self):
-		self.log("\n=====TURN {}=====\n".format(self.turn))
+		logging.info("\n=====TURN {}=====\n".format(self.turn))
 		player1, player2 = self.players
 		moves = {}
 		if self.turn in self.moves:
@@ -46,15 +44,15 @@ class Game:
 		self.moves[self.turn] = moves
 
 		for p, order in moves.iteritems():
-			self.log("Executing order:{}.{}({},{})".format(p.id, order[0], *order[1].coord))
+			logging.info("Executing order:{}.{}({},{})".format(p.id, order[0], *order[1].coord))
 			if order[0] == "move":
 				if p.can_move_to(order[1]):
 					p.move_to(order[1])
 					p.cooldown = self.movement_cooldown
-					self.log("\t{}.cooldown = {}, moved to ({},{})"\
+					logging.info("\t{}.cooldown = {}, moved to ({},{})"\
 						.format(p.id, p.cooldown, *p.loc.coord))
 				else:
-					self.log("\tIllegal move detected. {}.cooldown {}->{}"\
+					logging.info("\tIllegal move detected. {}.cooldown {}->{}"\
 						.format(p.id, p.cooldown, p.cooldown+self.illegal_move_penalty))
 					p.cooldown += self.illegal_move_penalty
 			elif order[0] == "spawn":
@@ -70,7 +68,7 @@ class Game:
 			elif order[0] == "new_piece":
 				new_id = p.get_next_id()
 				p_new = Piece(order[1], p, new_id, 1)
-				self.log("\t{} created at ({},{})".format(p_new.id, *p_new.loc.coord))
+				logging.info("\t{} created at ({},{})".format(p_new.id, *p_new.loc.coord))
 
 		for order, loc in moves.values():
 			if len(loc.contents) > 1:
@@ -87,7 +85,7 @@ class Game:
 		self.turn += 1
 
 	def resolve(self, loc, moves):
-		self.log("Resolving conflict at ({},{})".format(*loc.coord))
+		logging.info("Resolving conflict at ({},{})".format(*loc.coord))
 		to_remove = set()
 		
 		owners = set([item.owner for item in loc.contents])
@@ -97,12 +95,12 @@ class Game:
 			attackers = set()
 			for item in loc.contents:
 				if isinstance(item, Home):
-					self.log("Home base {} has been captured! "\
+					logging.info("Home base {} has been captured! "\
 						"The game is over.".format(item))
 					self.end_game(item.owner)
 					return
 				if item in moves:
-					self.log("\t{} moved this turn; {} is registered as an attacker"\
+					logging.info("\t{} moved this turn; {} is registered as an attacker"\
 						.format(item.id, item.owner.id))
 					attackers.add(item.owner)
 
@@ -111,7 +109,7 @@ class Game:
 					to_remove.add(item)
 
 			for item in to_remove:
-				self.log("\tremoving {} at ({},{})".format(item.id, *loc.coord))
+				logging.info("\tremoving {} at ({},{})".format(item.id, *loc.coord))
 				item.remove()
 		else:
 			new_range = 0
@@ -121,14 +119,14 @@ class Game:
 					to_remove.add(item)
 
 			for item in to_remove:
-				self.log("\tremoving {} at ({},{})".format(item.id, *loc.coord))
+				logging.info("\tremoving {} at ({},{})".format(item.id, *loc.coord))
 				item.remove()
 
 			if new_range > 0:
 				p = owners.pop()
 				new_id = p.get_next_id()
 				Piece(loc, p, new_id, new_range, cooldown=combine_time(new_range))
-				self.log("\t{} with range {} created at ({},{})".\
+				logging.info("\t{} with range {} created at ({},{})".\
 					format(new_id, new_range, *loc.coord))
 
 	def opponent(self, player):
