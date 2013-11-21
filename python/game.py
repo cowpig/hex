@@ -29,6 +29,16 @@ class Game:
 				new_id = player.get_next_id()
 				p = Piece(neighbor, player, new_id, 1)
 
+	def get_player(self, player_id):
+		if not type(player_id) == str:
+			raise Exception("player_id must be a string.")
+
+		for player in self.players:
+			if player.id == player_id:
+				return player
+
+		return None
+
 	def next_move(self):
 		logging.info("\n=====TURN {}=====\n".format(self.turn))
 		player1, player2 = self.players
@@ -270,7 +280,6 @@ def make_nearly_random_moves(player, game, board):
 			if game.opponent(player).home_node in piece.vision():
 				player.moves[game.turn][piece] = ("move", game.opponent(player).home_node)
 				moved = True
-				print 'FOUND IT'
 			else:
 				candidates = piece.vision() - set(board.home_nodes)
 				player.moves[game.turn][piece] = ("move", random.sample(candidates,1)[0])
