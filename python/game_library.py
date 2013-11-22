@@ -328,6 +328,9 @@ class Player:
 		if type(arg) == int:
 			arg = "{}{}".format(self.id, arg)
 
+		if type(arg) == unicode:
+			arg = arg.encode('ascii', 'ignore')
+
 		if type(arg) == str:
 			for piece in self.pieces:
 				if piece.id == arg:
