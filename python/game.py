@@ -304,7 +304,7 @@ def dumb_game(store_gamelog=False):
 		g.next_move()
 		print b
 		if moved and lines_logged < 20:
-			gamelog.append([g.gui_output(n) for n in b.nodes])
+			gamelog.append([g.gui_output_for_node(n) for n in b.nodes])
 		sleep(0.05)
 
 	if store_gamelog:
@@ -314,4 +314,4 @@ def dumb_game(store_gamelog=False):
 			f.write(";")
 
 if __name__ == "__main__":
-	dumb_game(True)
+	dumb_game()
