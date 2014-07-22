@@ -150,6 +150,17 @@ class Game:
 		with open(filename, 'wb') as f:
 			cPickle.dump(f, [self.board, self.players, self.moves, self.turn])
 
+	def game_state_json(self, players=None):
+		out = {}
+		if players=None:
+			players = self.players
+		for player in players:
+			out[player.id] = [p.__repr__() for p in player.pieces]
+
+		return json.dumps(out)
+
+
+	# deprecated
 	def gui_output_for_node(self, node):
 		out = {}
 		out['coord'] = node.coord
@@ -160,6 +171,7 @@ class Game:
 				out['vis'] += player.id
 		return out
 
+	# deprecated
 	def gui_output(self):
 		return json.dumps([self.gui_output_for_node(n) for n in self.board.nodes], separators=(',',':'))
 

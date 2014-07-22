@@ -156,6 +156,9 @@ class Board:
 			out += '\n'
 		return out
 
+	def gui_output(self):
+		return json.dumps([node.coord for node in self.nodes])
+
 class Node:
 	def __init__(self, coord, NE=None, E=None, SE=None, SW=None, W=None, NW=None):
 		self.dirs = {"NE": NE, "E":E, "SE":SE, "SW":SW, "W":W, "NW":NW}
@@ -469,13 +472,10 @@ class Piece(Item):
 
 	def __repr__(self):
 		out = {}
-		out['type'] = "piece"
-		out['range'] = self.range
+		out['r'] = self.range
 		out['id'] = self.id
-		out['cooldown'] = self.cooldown
-		out['owner'] = self.owner.id
+		out['cd'] = self.cooldown
 		out['loc'] = self.loc.coord
-		out['name'] = self.name
 		return json.dumps(out)
 
 def combine_time(r):
