@@ -2,6 +2,7 @@ import game_library as gl
 import cPickle
 import logging
 import random
+import json
 
 
 class Game:
@@ -27,8 +28,7 @@ class Game:
 			self.board.home_nodes[i].contents.peek().set_owner(player)
 			# Create the starting pieces for each player
 			for neighbor in self.board.home_nodes[i].dirs.values():
-				new_id = player.get_next_id()
-				p = gl.Piece(neighbor, player, new_id, 1)
+				p = gl.Piece(neighbor, player)
 
 	def get_player(self, player_id):
 		if not type(player_id) == str:
@@ -77,8 +77,7 @@ class Game:
 				else:
 					p.cooldown += self.illegal_move_penalty
 			elif order[0] == "new_piece":
-				new_id = p.get_next_id()
-				p_new = gl.Piece(order[1], p, new_id, 1)
+				p_new = gl.Piece(order[1], p)
 				logging.info("\t{} created at ({},{})".format(p_new.id, *p_new.loc.coord))
 
 		for order, loc in moves.values():
@@ -105,7 +104,7 @@ class Game:
 		if (player1 in owners) and (player2 in owners):
 			attackers = set()
 			for item in loc.contents:
-				if isinstance(item, Home):
+				if isinstance(item, gl.Home):
 					logging.info("Home base {} has been captured! "\
 						"The game is over.".format(item))
 					self.end_game(item.owner)
@@ -124,21 +123,11 @@ class Game:
 				item.remove()
 		else:
 			new_range = 0
-			for item in loc.contents:
-				if type(item) == gl.Piece:
-					new_range += item.range 
-					to_remove.add(item)
-
-			for item in to_remove:
-				logging.info("\tremoving {} at ({},{})".format(item.id, *loc.coord))
-				item.remove()
-
-			if new_range > 0:
-				p = owners.pop()
-				new_id = p.get_next_id()
-				gl.Piece(loc, p, new_id, new_range, cooldown=gl.combine_time(new_range))
-				logging.info("\t{} with range {} created at ({},{})".\
-					format(new_id, new_range, *loc.coord))
+			# if we add items other than  Pieces and Home bases, this while condition will have to change
+			while len(loc.contents) > 1:
+				p1, p2 = loc.contents.peek(2)
+				logging.info("\tcombining pieces {} and {} at ({}, {})".format(p1.id, p2.id, *loc.coord))
+				gl.combine(p1, p2)
 
 	def opponent(self, player):
 		if isinstance(player, gl.Item):

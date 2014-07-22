@@ -287,10 +287,22 @@ def opposite(dir):
 #
 # extension of the set class which has peek() and empty() functions
 class PeekSet(set):
-	def peek(self):
-		if len(self) == 0:
-			raise Exception("Cannot peek into an empty set")
-		return iter(self).next()
+	def peek(self, n=1):
+		if n < 0:
+			raise Exception("Cannot return less than 0 items.")
+
+		if len(self) < n:
+			raise Exception("Cannot peek at more items than the set contains.")
+		
+		if n == 1:
+			return iter(self).next()
+		else:
+			out = []
+			i = iter(self)
+			for _ in xrange(n):
+				out.append(i.next())
+
+			return out
 
 	def empty(self):
 		return len(self) == 0
@@ -348,14 +360,15 @@ class Player:
 		return out
 
 
-	def get_next_id(self):
-		current_ids = set([p.id for p in self.pieces])
+	# Probably removing this as I change Piece IDs to actual names
+	# def get_next_id(self):
+	# 	current_ids = set([p.id for p in self.pieces])
 
-		i = 0
-		while True:
-			if "{}{}".format(self.id, i) not in current_ids:
-				return "{}{}".format(self.id, i)
-			i += 1
+	# 	i = 0
+	# 	while True:
+	# 		if "{}{}".format(self.id, i) not in current_ids:
+	# 			return "{}{}".format(self.id, i)
+	# 		i += 1
 
 	def __repr__(self):
 		out = {}
@@ -396,7 +409,12 @@ class Home(Item):
 		return "{}'s home".format(self.owner)
 
 class Piece(Item):
-	def __init__(self, loc, owner, id, range, cooldown=0):
+	names = ["Abby","Abel","Abie","Acey","Acie","Adah","Adam","Adan","Adda","Adel","Aden","Adin","Aida","Aili","Ajay","Alan","Alba","Alby","Alda","Aldo","Alec","Alek","Alex","Alia","Alla","Ally","Alma","Alta","Alto","Alva","Alvy","Alys","Amey","Amie","Amil","Amin","Amir","Amit","Amma","Amon","Amos","Amya","Andy","Anie","Anna","Anne","Anya","Arah","Arba","Arch","Aria","Aric","Arie","Arla","Arlo","Arly","Arne","Arno","Aron","Arra","Arta","Arvo","Asha","Asia","Ason","Atha","Audy","Aura","Avie","Avis","Avon","Axel","Ayla","Babe","Baby","Bama","Barb","Bart","Beau","Bebe","Beda","Bell","Bena","Bert","Bess","Beth","Bill","Bina","Bird","Birt","Blas","Bode","Bose","Boss","Boyd","Brad","Brea","Bree","Bret","Bria","Bryn","Buck","Budd","Buel","Bula","Buna","Bunk","Burk","Burl","Burr","Burt","Bush","Byrd","Cade","Cael","Cain","Cale","Cali","Cami","Cara","Cari","Carl","Caro","Cary","Case","Cash","Cass","Cato","Ceil","Cena","Chad","Chas","Chaz","Cher","Chet","Chin","Chip","Ciji","Clay","Clem","Cleo","Cloe","Coby","Codi","Cody","Coen","Cole","Colt","Cora","Cori","Cory","Coty","Cris","Cruz","Cuba","Curt","Daja","Dale","Dana","Dane","Dani","Dann","Dara","Darl","Dave","Davy","Dawn","Dean","Debi","Deja","Dell","Dema","Demi","Dena","Deon","Derl","Desi","Dian","Dick","Dicy","Dina","Dink","Dino","Dion","Dirk","Diya","Dock","Dola","Doll","Dona","Donn","Dora","Dori","Dorr","Doss","Doug","Dove","Drew","Duff","Duke","Dwan","Dyan","Earl","Ebba","Eben","Eber","Echo","Eddy","Eden","Edie","Edla","Edna","Edra","Effa","Eino","Elam","Elba","Elby","Elda","Elex","Elia","Elie","Ella","Elle","Elma","Elmo","Elna","Elon","Eloy","Elsa","Else","Elta","Elva","Elza","Elzy","Emil","Emit","Emma","Emmy","Emry","Enid","Enos","Enzo","Eola","Erby","Eric","Erie","Erik","Erin","Eris","Erla","Erle","Erma","Erna","Eryn","Esau","Esco","Essa","Esta","Etha","Etna","Etta","Eula","Euna","Eura","Evan","Ever","Evia","Evie","Evon","Ewin","Exie","Ezra","Fate","Fawn","Faye","Ferd","Fern","Finn","Flem","Flor","Floy","Foch","Ford","Fran","Fred","Gabe","Gael","Gage","Gail","Gale","Gary","Gaye","Gena","Gene","Geno","Geri","Gigi","Gina","Gino","Glen","Gray","Greg","Guss","Gust","Gwen","Gwyn","Hale","Hali","Hall","Hamp","Hana","Hank","Hans","Harl","Harm","Hart","Hays","Hedy","Herb","Hill","Hoke","Hope","Hoyt","Huey","Hugh","Hugo","Hung","Hunt","Icey","Icie","Ilah","Ilda","Illa","Ilma","Ines","Inez","Inga","Iola","Iona","Ione","Iris","Irma","Irva","Isai","Isam","Isis","Isla","Isom","Ivah","Ivan","Iver","Ivey","Ivie","Ivor","Jace","Jack","Jada","Jade","Jair","Jake","Jame","Jami","Jana","Jane","Jann","Jase","Jaye","Jean","Jeff","Jena","Jens","Jere","Jeri","Jess","Jett","Jill","Joan","Jobe","Jodi","Jody","Joel","Joey","John","Joni","Jory","Jose","Josh","Joye","Jrue","Juan","Judd","Jude","Judi","Judy","Jule","Juli","June","Kaci","Kacy","Kade","Kael","Kaia","Kala","Kale","Kali","Kami","Kane","Kara","Kari","Karl","Kate","Kati","Katy","Kaya","Kaye","Keli","Kent","Keon","Keri","Kian","Kiel","King","Kipp","Kira","Kirk","Kirt","Kiya","Knox","Kobe","Koby","Koda","Kody","Koen","Kole","Kori","Kory","Kris","Kurt","Kyan","Kyla","Kyle","Kyra","Laci","Lacy","Lady","Lafe","Lala","Lana","Lane","Lani","Lara","Lark","Lars","Lary","Leah","Leda","Leia","Leif","Lela","Lena","Leon","Lera","Lesa","Less","Leta","Leva","Levi","Levy","Lexi","Liam","Lida","Lige","Lila","Lily","Lina","Link","Linn","Lisa","Lise","Lish","Lita","Liza","Loda","Lois","Lola","Loma","Lona","Lone","Long","Loni","Lora","Lori","Lota","Lott","Love","Loyd","Luca","Lucy","Luda","Luis","Luka","Luke","Lula","Lulu","Luna","Lupe","Lura","Lute","Lyda","Lyla","Lyle","Lynn","Mace","Maci","Mack","Macy","Maia","Male","Mame","Mara","Marc","Mari","Mark","Mart","Mary","Math","Matt","Maud","Maya","Maye","Mayo","Meda","Mell","Mena","Merl","Meta","Miah","Mike","Mila","Milo","Mima","Mimi","Mina","Mira","Miya","Mona","Mont","Mora","Mose","Murl","Myah","Myer","Myla","Myra","Myrl","Nada","Nana","Nash","Neal","Neha","Neil","Nell","Nels","Nena","Neta","Neva","Newt","Nick","Nico","Niki","Niko","Nila","Nile","Nils","Nina","Nira","Nita","Noah","Noel","Nola","Noma","Nona","Nora","Nova","Nyah","Nyla","Obed","Obie","Ocie","Octa","Odie","Odin","Odis","Odus","Okey","Olaf","Olan","Olar","Olen","Oley","Olga","Olie","Olin","Olof","Omar","Omer","Omie","Oney","Onie","Opal","Opha","Orah","Oral","Oran","Oren","Orie","Orin","Oris","Orla","Orlo","Orma","Orra","Osie","Otha","Otho","Otis","Otto","Ovid","Owen","Ozie","Page","Park","Pate","Paul","Pete","Phil","Pink","Ples","Polk","Purl","Rafe","Rahn","Rand","Raul","Reba","Reed","Reid","Rena","Rene","Reno","Reta","Reva","Rhea","Rhys","Rian","Rice","Rich","Rick","Rico","Risa","Rita","Riya","Robb","Robt","Roby","Rock","Roel","Rolf","Roll","Roma","Rome","Rona","Roni","Rory","Rosa","Rose","Ross","Rosy","Roxy","Rube","Rubi","Ruby","Rudy","Ruel","Ruie","Rush","Russ","Ruth","Ryan","Ryne","Sada","Sade","Sage","Sara","Saul","Scot","Sean","Sena","Seth","Shad","Shae","Shan","Shay","Shea","Shep","Shon","Sina","Sing","Skip","Skye","Stan","Star","Sula","Suzy","Syed","Taft","Tahj","Taja","Tami","Tana","Tara","Tari","Tate","Taya","Tena","Tera","Teri","Tess","Thad","Thea","Theo","Thor","Thos","Tina","Tiny","Tisa","Tito","Tobe","Tobi","Toby","Todd","Toma","Toni","Tony","Tori","Tory","Toya","Trae","Trey","Troy","Tuan","Tula","Tyra","Vada","Vara","Veda","Vela","Vena","Vera","Vere","Verl","Vern","Veta","Veva","Vick","Vicy","Vida","Vina","Vira","Vita","Vito","Viva","Wade","Walt","Ward","Wash","Watt","Wava","Webb","Wess","West","Whit","Will","Wing","Wirt","Wong","Wood","Xena","Yair","Yoel","York","Zack","Zada","Zaid","Zain","Zana","Zane","Zara","Zeke","Zela","Zena","Zeno","Zeta","Zina","Zion","Zita","Zoey","Zoie","Zola","Zona","Zora","Zula"]
+
+	def __init__(self, loc, owner, id=None, range=1, cooldown=0):
+		if id == None:
+			id = Piece.names.pop(random.randint(0,len(Piece.names)))
+
 		super(Piece, self).__init__(loc, owner, id)
 		# Distance, in hexes, that this Piece can see or move
 		self.range = range
@@ -405,6 +423,9 @@ class Piece(Item):
 		self.cooldown = cooldown
 
 		# Update the player object with this piece
+		owner.pieces.add(self)
+
+		loc.contents.add(self)
 		owner.pieces.add(self)
 
 	def remove(self):
@@ -416,6 +437,9 @@ class Piece(Item):
 			return False
 		
 		if not loc in self.vision():
+			return False
+
+		if loc == self.owner.home_node:
 			return False
 		
 		return True
@@ -451,23 +475,31 @@ class Piece(Item):
 		out['cooldown'] = self.cooldown
 		out['owner'] = self.owner.id
 		out['loc'] = self.loc.coord
+		out['name'] = self.name
 		return json.dumps(out)
 
+def combine_time(r):
+	return (3+r) * 2
 
+def combine(piece1, piece2):
+	assert(piece1.loc == piece2.loc)
+	assert(piece1.owner == piece2.owner)
+	
+	piece1.remove()
+	piece2.remove()
 
-def combine(piece1, piece2, loc):
-	owner = piece1.owner
-	owner.pieces.remove(piece1)
-	owner.pieces.remove(piece2)
-
-	new_id = owner.get_next_id()
+	if piece1.range >= piece2.range:
+		new_id = piece1.id
+		Piece.names.append(piece2.id)
+	else:
+		new_id = piece2.id
+		Piece.names.append(piece1.id)
 
 	new_range = piece1.range + piece2.range
 
-	Piece(owner, new_id, new_range, loc)
+	Piece(piece1.loc, piece1.owner, new_id, new_range, combine_time(new_range))
+
 
 def spawn_time(r):
 	return sum([i*6 for i in range(r)])/2 + r + 5 
 
-def combine_time(r):
-	return (3+r) * 2
