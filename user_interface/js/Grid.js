@@ -46,27 +46,21 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 	}
 
 	if (game_state){
-		// TODO: FIX THIS
-		if (Object.prototype.toString.call(input) === "[object String]")
-			input = JSON.parse(input);
-		
-		for (var i=0; i<input.length; i++)
-		{
-			var node = input[i];
-			console.log(JSON.stringify(node));
-			
-			xpos = node.coord[0];
-			ypos = node.coord[1];
-
-			console.log("(" + xpos + ", " + ypos + ")");
-			new Hex.Hexagon(id, node.vis, xpos, ypos, width, height, z).draw(ctx);
+		for (var player in game_state) {
+			if (game_state.hasOwnProperty(player)) {
+				for (var piece in game_state[player]) {
+					var id = player + "_" + piece['id'] + "_" + piece['r'];
+					new Hex.Hexagon(id, player, piece['loc'][0], piece['loc'][1], this.w_px, this.h_px, this.z);
+				}
+			}
 		}
-	}
+
+		// TODO: visible range
 }
 
 
 
-// TODO: decide whether to encode everything in Id or create instance variables
+// TODO
 Game.Item.prototype.get_range = function() {
 	if (this.Id.charAt(0))
 }

@@ -150,7 +150,7 @@ class Game:
 		with open(filename, 'wb') as f:
 			cPickle.dump(f, [self.board, self.players, self.moves, self.turn])
 
-	def game_state_json(self, players=None):
+	def get_game_state(self, players=None):
 		out = {}
 		if players=None:
 			players = self.players
