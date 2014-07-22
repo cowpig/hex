@@ -2,9 +2,9 @@ var Game = Game || {};
 
 // takes the output of a Hex board to initialize
 Game.Board = function(board, homes, w_px, h_px) {
-	if (w_px == null)
+	if (w_px === null)
 		w_px = 40;
-	if (h_px == null)
+	if (h_px === null)
 		h_px = 40;
 
 	this.nodes = board['nodes'];
@@ -23,6 +23,8 @@ Game.Board = function(board, homes, w_px, h_px) {
 
 	this.total_width = (num_x + 0.5) * this.w_px;
 	this.total_height = (num_y + 0.5) * (this.h_px - (this.h_px-z)/2);
+
+	this.homes = homes;
 };
 
 Game.Board.prototype.draw = function(game_state, canvas) {
@@ -35,13 +37,17 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 	ctx.fillStyle = "black";
 	ctx.clearRect(0, 0, this.total_width, this.total_height);
 
-	for (var i=0; i<this.nodes.length; i++){
-		node = this.nodes[i];
-		new Hex.Hexagon(null, null, node[0], node[1], this.w_px, this.h_px, this.z)
+	for (var node in nodes){
+		var id = null;
+		if (node.toString() of this.homes){
+			id = this.homes[node.toString()];
+		}
+		new Hex.Hexagon(id, null, node[0], node[1], this.w_px, this.h_px, this.z);
 	}
 
-	if (input){
-		if (Object.prototype.toString.call(input) == "[object String]")
+	if (game_state){
+		// TODO: FIX THIS
+		if (Object.prototype.toString.call(input) === "[object String]")
 			input = JSON.parse(input);
 		
 		for (var i=0; i<input.length; i++)

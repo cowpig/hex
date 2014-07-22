@@ -160,6 +160,7 @@ class Board:
 		out = {}
 		out['size'] = "{},{}".format(width, height)
 		out['nodes'] = [node.coord for node in self.nodes]
+		out['homes'] = {home.coord.__repr__():home.owner.id for home in self.home_nodes}
 		return json.dumps(out)
 
 class Node:
