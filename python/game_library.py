@@ -157,7 +157,10 @@ class Board:
 		return out
 
 	def gui_output(self):
-		return json.dumps([node.coord for node in self.nodes])
+		out = {}
+		out['size'] = "{},{}".format(width, height)
+		out['nodes'] = [node.coord for node in self.nodes]
+		return json.dumps(out)
 
 class Node:
 	def __init__(self, coord, NE=None, E=None, SE=None, SW=None, W=None, NW=None):
