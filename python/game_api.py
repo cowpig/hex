@@ -29,28 +29,31 @@ class GameApi(object):
 		moves = {}
 
 		for order_string in order_strings:
-			# try:
-			piece_id, the_rest = order_string.split(".")
-			order, dest_str = the_rest.split(" ")
+			try:
+				piece_id, the_rest = order_string.split(".")
+				order, dest_str = the_rest.split(" ")
 
-			piece = player[piece_id]
+				piece = player[piece_id]
 
-			# we will allow destinations to be given in one of two ways
-			#	E-E-SE, for destinations relative to the node
-			#	(x,y) for absolute destinations
-			if dest_str[0] == "(":
-				x, y = dest_str[1:-1].split(",")
-				dest = self.game.board[int(x), int(y)]
-			else:
-				directions = dest_str.split("-")
-				dest = piece.loc
-				for direction in directions:
-					dest = dest[direction]
+				# we will allow destinations to be given in one of two ways
+				#	E-E-SE, for destinations relative to the node
+				#	(x,y) for absolute destinations
+				if dest_str[0] == "(":
+					x, y = dest_str[1:-1].split(",")
+					dest = self.game.board[int(x), int(y)]
+				else:
+					directions = dest_str.split("-")
+					dest = piece.loc
+					for direction in directions:
+						dest = dest[direction]
 
-			moves[piece] = (order, dest)
+				moves[piece] = (order, dest)
 
-			# except Exception as e:
-			# 	return e.message
+			except Exception as e:
+				msg = "Error parsing order string:\n\t{}".format(order_string)
+				msg += "\nerror message:\n\t{}".format(e.message)
+				print msg
+				# raise Exception(msg)
 
 		player.moves[self.game.turn] = moves
 		return None

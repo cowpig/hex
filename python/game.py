@@ -1,16 +1,17 @@
-from game_library import *
+import game_library as gl
 import cPickle
 import logging
+import random
 
 
 class Game:
 	def __init__(self, 
 				board=None, 
-				players=[Player("A", PeekSet()), Player("B", PeekSet())], 
+				players=[gl.Player("A", gl.PeekSet()), gl.Player("B", gl.PeekSet())], 
 				moves={}):
 		logging.info("constructor called")
 		if board == None:
-			self.board = Board(20,20)
+			self.board = gl.Board(20,20)
 		else:
 			self.board = board
 		# list of players, currently only supporting two
@@ -27,7 +28,7 @@ class Game:
 			# Create the starting pieces for each player
 			for neighbor in self.board.home_nodes[i].dirs.values():
 				new_id = player.get_next_id()
-				p = Piece(neighbor, player, new_id, 1)
+				p = gl.Piece(neighbor, player, new_id, 1)
 
 	def get_player(self, player_id):
 		if not type(player_id) == str:
@@ -77,7 +78,7 @@ class Game:
 					p.cooldown += self.illegal_move_penalty
 			elif order[0] == "new_piece":
 				new_id = p.get_next_id()
-				p_new = Piece(order[1], p, new_id, 1)
+				p_new = gl.Piece(order[1], p, new_id, 1)
 				logging.info("\t{} created at ({},{})".format(p_new.id, *p_new.loc.coord))
 
 		for order, loc in moves.values():
@@ -124,7 +125,7 @@ class Game:
 		else:
 			new_range = 0
 			for item in loc.contents:
-				if type(item) == Piece:
+				if type(item) == gl.Piece:
 					new_range += item.range 
 					to_remove.add(item)
 
@@ -135,14 +136,14 @@ class Game:
 			if new_range > 0:
 				p = owners.pop()
 				new_id = p.get_next_id()
-				Piece(loc, p, new_id, new_range, cooldown=combine_time(new_range))
+				gl.Piece(loc, p, new_id, new_range, cooldown=gl.combine_time(new_range))
 				logging.info("\t{} with range {} created at ({},{})".\
 					format(new_id, new_range, *loc.coord))
 
 	def opponent(self, player):
-		if isinstance(player, Item):
+		if isinstance(player, gl.Item):
 			player = item.owner
-		if isinstance(player, Player):
+		if isinstance(player, gl.Player):
 			if self.players[0] == player:
 				return self.players[1]
 			elif self.players[1] == player:
@@ -177,7 +178,7 @@ def load_game(filename, go_to_turn=False):
 	with open(filename, 'rb') as f:
 		board, players, moves, turn = cPickle.load(filename)
 	for player in players:
-		player.pieces = PeekSet()
+		player.pieces = gl.PeekSet()
 	game = Game(board, players, moves)
 	if go_to_turn:
 		for i in xrange(turn):
@@ -186,7 +187,7 @@ def load_game(filename, go_to_turn=False):
 
 
 def test_game():
-	b = Board(40, 40)
+	b = gl.Board(40, 40)
 	g = Game(b)
 	g.log_to_terminal = True
 	print b
@@ -246,8 +247,8 @@ def make_random_moves(player, game):
 # both players move completely randomly
 def random_game(store_gamelog=False):
 	gamelog = []
-	b = Board(20, 20)
-	g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
+	b = gl.Board(20, 20)
+	g = Game(b, [gl.Player("A", gl.PeekSet()), gl.Player("B", gl.PeekSet())])
 	g.log_to_terminal = True
 	print b
 	p1, p2 = g.players
@@ -290,8 +291,8 @@ def make_nearly_random_moves(player, game, board):
 
 def dumb_game(store_gamelog=False):
 	gamelog = []
-	b = Board(20, 20)
-	g = Game(b, [Player("A", PeekSet()), Player("B", PeekSet())])
+	b = gl.Board(20, 20)
+	g = Game(b, [gl.Player("A", gl.PeekSet()), gl.Player("B", gl.PeekSet())])
 	g.log_to_terminal = False
 	print b
 	p1, p2 = g.players
