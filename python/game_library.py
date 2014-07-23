@@ -163,7 +163,7 @@ class Board:
 		out = {}
 		out['size'] = "{},{}".format(self.width, self.height)
 		out['nodes'] = [node.coord for node in self.nodes]
-		out['homes'] = {home.coord.__repr__():home.contents.peek().owner.id for home in self.home_nodes}
+		out['homes'] = {str(list(home.coord)):home.contents.peek().owner.id for home in self.home_nodes}
 		return json.dumps(out)
 
 class Node:

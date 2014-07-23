@@ -25,7 +25,10 @@ class GameApi(object):
 		self.game.next_move()
 
 	# parses a move input string
-	def parse_input(self, input, player):
+	def parse_input(self, input):
+		if input == "newgame":
+			return "board&=" + self.new_game()
+
 		order_strings = input.split("\n")
 		moves = {}
 

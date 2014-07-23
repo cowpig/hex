@@ -80,7 +80,7 @@ Hex.Hexagon.prototype.draw = function(ctx) {
 		ctx.fillStyle = "#FFB280";
 	else if (this.vis === "AB" || this.vis === "BA")
 		ctx.fillStyle = "#FF99FF";
-	else if (this.vis.charAt(0) === '#')
+	else if (this.vis != null && this.vis.charAt(0) === '#')
 		ctx.fillStyle = this.vis;
 	else
 		ctx.fillStyle = '#e6e6e6'

@@ -14,7 +14,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 	
 	def on_message(self, message):
 		print 'message received %s' % message
-		return_statement = self.api.parse_input(message, self.player)
+		return_statement = self.api.parse_input(message)
 		self.write_message(return_statement)
 
 	def on_close(self):

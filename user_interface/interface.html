@@ -7,6 +7,7 @@
 
 	var wsUri = "ws://localhost:8000/ws";
 	var websocket = new WebSocket(wsUri);
+	var grid;
 	var statusBar;
 	function init() { 
 		statusBar = document.getElementById("statusDiv");
@@ -18,17 +19,20 @@
 	}
 	function onOpen(evt) { 
 		writeToScreen("CONNECTED");
+		websocket.send("newgame");
 	}
 	function onClose(evt) { 
 		writeToScreen("DISCONNECTED");
 	}
 	function onMessage(evt) {
-		console.log("data received:\n" + evt);
-		if (evt.data[0] == "[") {
-			drawHexGrid(evt.data, 20, 20, 40, 40);
-		} else {
-			writeToScreen("Error: " + evt.data);
+		console.log("data received:\n" + JSON.stringify(evt));
+		var data = evt.data.split("&=");
+
+		if (data[0] == "board"){
+			grid = new Game.Board(JSON.parse(data[1]), 50, 50);
+			grid.draw(null, document.getElementById("hexCanvas"));
 		}
+
 	}
 	function onError(evt) { 
 		writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
@@ -50,18 +54,17 @@
 	window.addEventListener("load", init, false);
 </script>  
 </div>
-<h2>WebSocket Test</h2> 
-<div id="statusDiv">
-</div>
-<br>
-<div id="inputDiv">
-	<textarea id="inputTxt" cols="80" rows="10"></textarea>
-	<br>
-	<button id="send">send instructions</button>
-</div>
-<div id="canvasDiv">
 	<center>
-	<canvas id="hexCanvas" width="900" height="900" style="width:900px;height:900px" />
+		<div id="statusDiv">
+		</div>
+		<div id="canvasDiv">
+			<canvas id="hexCanvas" width="1050" height="800" style="width:1050px;height:800px" />
+		</div>
+		<br>
+		<div id="inputDiv">
+			<textarea id="inputTxt" cols="80" rows="10"></textarea>
+			<br>
+			<button id="send">send instructions</button>
+		</div>
 	</center>
-</div>
 </html>
