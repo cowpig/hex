@@ -152,7 +152,7 @@ class Game:
 
 	def get_game_state(self, players=None):
 		out = {}
-		if players=None:
+		if players == None:
 			players = self.players
 		for player in players:
 			out[player.id] = [p.__repr__() for p in player.pieces]

@@ -28,7 +28,7 @@ Game.Board = function(board, homes, w_px, h_px) {
 };
 
 Game.Board.prototype.draw = function(game_state, canvas) {
-	function(input, num_x, num_y, width, height)
+	// function(input, num_x, num_y, width, height)
 	console.log("drawing hex grid with input:\n" + input);
 
 	//solve quadratic to get side length
@@ -39,7 +39,7 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 
 	for (var node in nodes){
 		var id = null;
-		if (node.toString() of this.homes){
+		if (node.toString() in this.homes){
 			id = this.homes[node.toString()];
 		}
 		new Hex.Hexagon(id, null, node[0], node[1], this.w_px, this.h_px, this.z);
@@ -54,6 +54,7 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 				}
 			}
 		}
+	}
 
 		// TODO: visible range
 }
@@ -61,6 +62,6 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 
 
 // TODO
-Game.Item.prototype.get_range = function() {
-	if (this.Id.charAt(0))
-}
+// Game.Item.prototype.get_range = function() {
+// 	if (this.Id.charAt(0))
+// }

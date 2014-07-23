@@ -16,6 +16,7 @@ class GameApi(object):
 
 	def new_game(self, *args):
 		self.game = Game(*args)
+		return self.game.board.gui_output()
 
 	def make_opponent_moves(self, player):
 		make_nearly_random_moves(self.game.opponent(player), self.game, self.game.board)

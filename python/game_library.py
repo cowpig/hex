@@ -44,6 +44,9 @@ class Board:
 	def __init__(self, width, height):
 		# Initialize the hex grid
 		self.grid = []
+		self.width = width
+		self.height = height
+
 		for x in xrange(width):
 			self.grid.append(range(height))
 
@@ -158,9 +161,9 @@ class Board:
 
 	def gui_output(self):
 		out = {}
-		out['size'] = "{},{}".format(width, height)
+		out['size'] = "{},{}".format(self.width, self.height)
 		out['nodes'] = [node.coord for node in self.nodes]
-		out['homes'] = {home.coord.__repr__():home.owner.id for home in self.home_nodes}
+		out['homes'] = {home.coord.__repr__():home.contents.peek().owner.id for home in self.home_nodes}
 		return json.dumps(out)
 
 class Node:

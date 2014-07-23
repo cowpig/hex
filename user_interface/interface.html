@@ -13,7 +13,7 @@
 		if (!'WebSocket' in window){
 			writeToScreen('<span style="color: red;">ERROR: Update your browser to one that supports websockets. A list can be found <a href="http://caniuse.com/websockets">here</a></span>');
 		} else {
-			testWebSocket();
+			prepareWebsocket();
 		}
 	}
 	function onOpen(evt) { 
@@ -23,7 +23,7 @@
 		writeToScreen("DISCONNECTED");
 	}
 	function onMessage(evt) {
-		console.log("new data recieved");
+		console.log("data received:\n" + evt);
 		if (evt.data[0] == "[") {
 			drawHexGrid(evt.data, 20, 20, 40, 40);
 		} else {
@@ -33,7 +33,7 @@
 	function onError(evt) { 
 		writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
 	}
-	function testWebSocket() {
+	function prepareWebsocket() {
 		websocket.onopen = function(evt) { onOpen(evt) };
 		websocket.onclose = function(evt) { onClose(evt) };
 		websocket.onmessage = function(evt) { onMessage(evt) };
