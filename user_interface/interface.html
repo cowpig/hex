@@ -1,70 +1,29 @@
-<!DOCTYPE html>  
-<meta charset="utf-8" />  
-<title>WebSocket Test</title>  
-<script type="text/javascript" src="js/HexagonTools.js"></script>
-<script type="text/javascript" src="js/Grid.js"></script>
-<script language="javascript" type="text/javascript">
+<!DOCTYPE html>
+<html>
+<head>  
+	<meta charset="utf-8" />  
+	<title>WebSocket Test</title>  
+	<script type="text/javascript" src="js/Underscore.js"></script>
+	<script type="text/javascript" src="js/jquery-2.1.1.js"></script> 
+	<script type="text/javascript" src="js/HexagonTools.js"></script>
+	<script type="text/javascript" src="js/Grid.js"></script>
+	<script type="text/javascript" src="js/websocket-connector.js"></script>
+	<link rel="stylesheet" type="text/css" href="css.css"></script>
+</head>
+<body>
+	<div id="status">
+	</div>
 
-	var wsUri = "ws://localhost:8000/ws";
-	var websocket = new WebSocket(wsUri);
-	var grid;
-	var statusBar;
-	function init() { 
-		statusBar = document.getElementById("statusDiv");
-		if (!'WebSocket' in window){
-			writeToScreen('<span style="color: red;">ERROR: Update your browser to one that supports websockets. A list can be found <a href="http://caniuse.com/websockets">here</a></span>');
-		} else {
-			prepareWebsocket();
-		}
-	}
-	function onOpen(evt) { 
-		writeToScreen("CONNECTED");
-		websocket.send("newgame");
-	}
-	function onClose(evt) { 
-		writeToScreen("DISCONNECTED");
-	}
-	function onMessage(evt) {
-		console.log("data received:\n" + JSON.stringify(evt));
-		var data = evt.data.split("&=");
+	<div id="canvas">
+		<canvas id="hexCanvas"></canvas>
+	</div>
+	
+	<div id="editor">
+		<textarea id="codebox"></textarea>
+	</div>
 
-		if (data[0] == "board"){
-			grid = new Game.Board(JSON.parse(data[1]), 50, 50);
-			grid.draw(null, document.getElementById("hexCanvas"));
-		}
-
-	}
-	function onError(evt) { 
-		writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-	}
-	function prepareWebsocket() {
-		websocket.onopen = function(evt) { onOpen(evt) };
-		websocket.onclose = function(evt) { onClose(evt) };
-		websocket.onmessage = function(evt) { onMessage(evt) };
-		websocket.onerror = function(evt) { onError(evt) };
-		document.getElementById("send").onclick = function () {
-			websocket.send(document.getElementById("inputTxt").value);
-			console.log("click registered.");
-		};
-
-	}
-	function writeToScreen(message) { 
-		statusBar.innerHTML = message;
-	}
-	window.addEventListener("load", init, false);
-</script>  
-</div>
-	<center>
-		<div id="statusDiv">
-		</div>
-		<div id="canvasDiv">
-			<canvas id="hexCanvas" width="1050" height="800" style="width:1050px;height:800px" />
-		</div>
-		<br>
-		<div id="inputDiv">
-			<textarea id="inputTxt" cols="80" rows="10"></textarea>
-			<br>
-			<button id="send">send instructions</button>
-		</div>
-	</center>
+	<div id="toolbar">
+		<a id="send">SEND STUFF!</a>
+	</div>
+</body>
 </html>

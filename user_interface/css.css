@@ -1,0 +1,56 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	width: 100%;
+	height: 100%;
+}
+body > div{
+	position: fixed;
+}
+
+#status {
+	width: 25%;
+	right: 0;
+	height: calc(100% - 24px);
+	background-color:red;
+}
+
+#canvas {
+	left: 0;
+	top: 0;
+	width: 75%;
+	height: 75%;
+	background-color:blue;
+}
+
+#hexCanvas {
+	width:100%;
+	height:100%;
+}
+
+#editor {
+	top: 75%;
+	height: calc(25% - 24px);
+	left: 0;
+	width: 75%;
+	background-color:yellow;
+}
+
+#toolbar {
+	left:0;
+	width:100%;
+	height:24px;
+	bottom:0;
+	background-color:green;
+}
+
+#toolbar a {
+	background-color:purple;
+}
+
+#codebox {
+	width:100%;
+	height:100%;
+}
