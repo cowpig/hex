@@ -52,11 +52,19 @@ function prepareWebsocket() {
 		websocket.send(document.getElementById("inputTxt").value);
 		console.log("click registered.");
 	});
-
 }
 
 function writeToScreen(message) { 
 	statusBar.innerHTML = message;
 }
 
+function resizeCanvas() {
+	var map = $("#map");
+	canvas[0].height = map.height();
+	canvas[0].width = map.width();
+	grid.draw(null, canvas);
+	console.log("resize detected");
+}
+
 $("document").ready(init);
+$(window).resize(resizeCanvas);

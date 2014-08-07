@@ -13,12 +13,15 @@ Game.Board = function(board_info) {
 	this.num_y = parseFloat(nxm[1]);
 
 	this.homes = board_info['homes'];
+
+	this.game_state = null;
 };
 
 Game.Board.prototype.draw = function(game_state, canvas) {
 
-	var w_px = canvas.width() / (0.5 + this.num_x);
-	var h_px = canvas.height() / (this.num_y);
+	console.log(canvas);
+	var w_px = canvas[0].width / (0.5 + this.num_x);
+	var h_px = canvas[0].height / (this.num_y);
 
 	// w_px = 20;
 	// h_px = 20;
@@ -51,7 +54,7 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 		new Hex.Hexagon(id, null, node[0], node[1], w_px, h_px, this.z).draw(ctx);
 	}
 
-	if (game_state){
+	if (this.game_state){
 		for (var player in game_state) {
 			if (game_state.hasOwnProperty(player)) {
 				for (var piece in game_state[player]) {
