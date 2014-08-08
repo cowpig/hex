@@ -29,14 +29,14 @@ Hex.get_z = function(width, height) {
 // The main attraction
 Hex.Hexagon = function(id, vis, xpos, ypos, width, height, z) {
 
-	console.log(id + "," + xpos + "," + ypos + "," + width + "," + height + "," + z)
+	// console.log(id + "," + xpos + "," + ypos + "," + width + "," + height + "," + z)
 
 	var x = xpos * width;
 	if (ypos % 2 === 1)
 		x += width / 2;
 	var y = ypos * (height - (height-z)/2);
 
-	console.log("creating hex at (" + x + ", " + y + ")");
+	// console.log("creating hex at (" + x + ", " + y + ")");
 
 	this.Points = [];//Polygon Base
 	var x1 = null;

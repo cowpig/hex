@@ -21,6 +21,8 @@ body > div{
 	left: 0;
 	top: 0;
 	background-color:blue;
+	height: calc(100% - 200px);
+	width: 75%;
 }
 
 #hexCanvas{
@@ -32,8 +34,8 @@ body > div{
 }
 
 #editor {
-	top: 75%;
-	height: calc(25% - 24px);
+	top: calc(100% - 200px);
+	height: 176px;
 	left: 0;
 	width: 75%;
 	background-color:yellow;

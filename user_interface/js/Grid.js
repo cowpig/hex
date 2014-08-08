@@ -21,12 +21,20 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 
 	console.log(canvas);
 	var w_px = canvas[0].width / (0.5 + this.num_x);
-	var h_px = canvas[0].height / (this.num_y);
+	var h_px = (canvas[0].height * this.num_x * w_px) / (canvas[0].width * this.num_y);
+	var h_px_old = canvas[0].height / this.num_y;
+
+	console.log("w_px : " + w_px);
+	console.log("h_px : " + h_px);
+	console.log("h_px_old : " + h_px_old);
+	console.log("num_x : " + this.num_x);
+	console.log("num_y : " + this.num_y);
+
 
 	// w_px = 20;
 	// h_px = 20;
 
-	console.log("drawing hex grid with input:\n" + game_state);
+	// console.log("drawing hex grid with input:\n" + game_state);
 
 	//solve quadratic to get side length (z)
 	var a = -3.0;
@@ -46,7 +54,7 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 	for (var i in this.nodes){
 		var node = this.nodes[i];
 		var id = null;
-		console.log(JSON.stringify(node));
+		// console.log(JSON.stringify(node));
 		if (node.toString() in this.homes){
 			id = this.homes[node.toString()];
 			console.log("home at " + node.toString());

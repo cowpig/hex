@@ -58,12 +58,12 @@ function writeToScreen(message) {
 	statusBar.innerHTML = message;
 }
 
-function resizeCanvas() {
+function resizeCanvas(e) {
 	var map = $("#map");
 	canvas[0].height = map.height();
 	canvas[0].width = map.width();
 	grid.draw(null, canvas);
-	console.log("resize detected");
+	console.log(e);
 }
 
 $("document").ready(init);
