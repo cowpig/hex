@@ -15,20 +15,34 @@ Game.Board = function(board_info) {
 	this.homes = board_info['homes'];
 
 	this.game_state = null;
+
+	this.offsetX = 0;
+	this.offsetY = 0;
 };
+
+Game.Board.prototype.recenter = function(centerOnX, centerOnY) {
+	this.offsetX += centerOnX;
+	this.offsetY += centerOnY;
+}
 
 Game.Board.prototype.draw = function(game_state, canvas) {
 
-	console.log(canvas);
-	var w_px = canvas[0].width / (0.5 + this.num_x);
-	var h_px = (canvas[0].height * this.num_x * w_px) / (canvas[0].width * this.num_y);
-	var h_px_old = canvas[0].height / this.num_y;
+	// console.log(canvas);
 
-	console.log("w_px : " + w_px);
-	console.log("h_px : " + h_px);
-	console.log("h_px_old : " + h_px_old);
-	console.log("num_x : " + this.num_x);
-	console.log("num_y : " + this.num_y);
+	var centerX = canvas[0].width / 2;
+	var centerY = canvas[0].height / 2;
+
+	var w_px = canvas[0].width / (0.5 + this.num_x);
+	var h_px = w_px;
+	// var h_px = (canvas[0].height * this.num_x * w_px) / (canvas[0].width * this.num_y);
+	// var h_px_old = canvas[0].height / this.num_y;
+
+	// calculate where each hexagon goes
+
+	// console.log("w_px : " + w_px);
+	// console.log("h_px : " + h_px);
+	// console.log("num_x : " + this.num_x);
+	// console.log("num_y : " + this.num_y);
 
 
 	// w_px = 20;
@@ -51,13 +65,18 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 	ctx.fillStyle = "black";
 	ctx.clearRect(0, 0, this.total_width, this.total_height);
 
+	console.log("center:", centerX, ",", centerY);
+
+	console.log("Translate back: (", centerX - this.offsetX, centerY - this.offsetY, ")");
+	ctx.translate(centerX - this.offsetX, centerY - this.offsetY);
+
 	for (var i in this.nodes){
 		var node = this.nodes[i];
 		var id = null;
 		// console.log(JSON.stringify(node));
 		if (node.toString() in this.homes){
 			id = this.homes[node.toString()];
-			console.log("home at " + node.toString());
+			// console.log("home at " + node.toString());
 		}
 		new Hex.Hexagon(id, null, node[0], node[1], w_px, h_px, this.z).draw(ctx);
 	}
@@ -72,6 +91,8 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 			}
 		}
 	}
+	console.log("Translate: (", this.offsetX - centerX, this.offsetY - centerY, ")");
+	ctx.translate(this.offsetX - centerX, this.offsetY - centerY);
 
 		// TODO: visible range
 }

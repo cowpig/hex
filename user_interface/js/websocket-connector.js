@@ -16,6 +16,7 @@ function init() {
 	} else {
 		canvas = $("#hexCanvas");
 		prepareWebsocket();
+		canvas.click(moveMap);
 	}
 }
 
@@ -34,6 +35,7 @@ function onMessage(evt) {
 
 	if (data[0] == "board"){
 		grid = new Game.Board(JSON.parse(data[1]));
+		resizeCanvas();
 		grid.draw(null, canvas);
 	}
 
@@ -63,8 +65,18 @@ function resizeCanvas(e) {
 	canvas[0].height = map.height();
 	canvas[0].width = map.width();
 	grid.draw(null, canvas);
-	console.log(e);
+	// console.log(e);
 }
+
+function moveMap(e) {
+	// console.log(e);
+	var x = e.clientX;
+	var y = e.clientY;
+	console.log("click: (", x, ", ", y, ")");
+	grid.recenter(x - canvas[0].width / 2, y - canvas[0].height / 2);
+	grid.draw(null, canvas);
+}
+
 
 $("document").ready(init);
 $(window).resize(resizeCanvas);
