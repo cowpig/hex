@@ -1,11 +1,12 @@
+from django.db import models
+
 import game_library as gl
 import cPickle
 import logging
 import random
 import json
 
-
-class Game:
+class Game(models.Model):
 	def __init__(self, 
 				board=None, 
 				players=[gl.Player("A", gl.PeekSet()), gl.Player("B", gl.PeekSet())], 

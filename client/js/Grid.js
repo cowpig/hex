@@ -21,14 +21,15 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 
 	console.log(canvas);
 	var w_px = canvas[0].width / (0.5 + this.num_x);
-	var h_px = (canvas[0].height * this.num_x * w_px) / (canvas[0].width * this.num_y);
-	var h_px_old = canvas[0].height / this.num_y;
+	var h_px = w_px;
+	// var h_px = (canvas[0].height * this.num_x * w_px) / (canvas[0].width * this.num_y);
+	// var h_px_old = canvas[0].height / this.num_y;
 
-	console.log("w_px : " + w_px);
-	console.log("h_px : " + h_px);
-	console.log("h_px_old : " + h_px_old);
-	console.log("num_x : " + this.num_x);
-	console.log("num_y : " + this.num_y);
+	// console.log("w_px : " + w_px);
+	// console.log("h_px : " + h_px);
+	// console.log("h_px_old : " + h_px_old);
+	// console.log("num_x : " + this.num_x);
+	// console.log("num_y : " + this.num_y);
 
 
 	// w_px = 20;

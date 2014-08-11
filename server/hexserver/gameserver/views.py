@@ -1,3 +1,5 @@
+from django.shortcuts import render
+
 from game import Game, make_nearly_random_moves
 
 class GameApi(object):

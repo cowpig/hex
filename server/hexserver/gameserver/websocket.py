@@ -7,7 +7,11 @@ from game_api import GameApi
 # todo : assign connection to a player
 
 class WSHandler(tornado.websocket.WebSocketHandler):
+	# def __init__(self):
+	# 	self.users = {}
+
 	def open(self):
+		# import pdb; pdb.set_trace()
 		print 'new connection'
 		self.api = GameApi(self.write_message)
 		print self.api.game.board
@@ -27,3 +31,4 @@ if __name__ == "__main__":
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.listen(8000)
 	tornado.ioloop.IOLoop.instance().start()
+

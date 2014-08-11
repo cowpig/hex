@@ -8,7 +8,6 @@ var canvas;
 
 
 function init() { 
-	console.log("also herr");
 	statusBar = document.getElementById("status");
 	if (!'WebSocket' in window){
 		console.log ("no websocket");
@@ -17,6 +16,7 @@ function init() {
 		canvas = $("#hexCanvas");
 		prepareWebsocket();
 	}
+
 }
 
 function onOpen(evt) { 
@@ -34,6 +34,7 @@ function onMessage(evt) {
 
 	if (data[0] == "board"){
 		grid = new Game.Board(JSON.parse(data[1]));
+		resizeCanvas();
 		grid.draw(null, canvas);
 	}
 
@@ -63,7 +64,6 @@ function resizeCanvas(e) {
 	canvas[0].height = map.height();
 	canvas[0].width = map.width();
 	grid.draw(null, canvas);
-	console.log(e);
 }
 
 $("document").ready(init);
