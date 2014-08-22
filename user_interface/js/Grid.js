@@ -67,19 +67,28 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 	ctx.clearRect(0, 0, this.total_width, this.total_height);
 
 	console.log("center:", centerX, ",", centerY);
-
+	console.log("offsets: (", this.offsetX, this.offsetY, ")");
 	console.log("Translate back: (", centerX - this.offsetX, centerY - this.offsetY, ")");
+	var moveX = centerX - this.offsetX;
+	var moveY = centerY - this.offsetY;
 	ctx.translate(centerX - this.offsetX, centerY - this.offsetY);
 
+	var self=this;
+	var wrapCoords = function(xpos, ypos) {
 
-	var wrapCoords = function(xpos, ypos, w_hex, h_hex, offX, offY, w_c, h_c, z) {
-		var x = xpos * w_hex;
+
+		var x = xpos * w_px;
 		if (ypos % 2 === 1)
-			x += w_hex / 2;
-		var y = ypos * (h_hex - (h_hex-z)/2);
+			x += w_px / 2;
+		var y = ypos * (h_px - (h_px - self.z) / 2);
 
-		x = (x + offX) % w_c;
-		y = (y + offY) % h_c;
+
+		console.log(centerX);
+		if (x > cWidth - moveX)
+			x -= self.total_width;
+
+		if (y > cHeight - moveY && (y - cHeight < 0))
+			y -= self.total_height;
 
 		return [x,y];
 	}
@@ -92,7 +101,7 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 			id = this.homes[node.toString()];
 			// console.log("home at " + node.toString());
 		}
-		var xy = wrapCoords(node[0], node[1], w_px, h_px, this.offsetX, this.offsetY, cWidth, cHeight, this.z);
+		var xy = wrapCoords(node[0], node[1]);
 		new Hex.Hexagon(id, null, xy[0], xy[1], w_px, h_px, this.z).draw(ctx);
 	}
 
@@ -102,7 +111,7 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 				for (var piece in game_state[player]) {
 					var id = player + "_" + piece['id'] + "_" + piece['r'];
 
-					var xy = wrapCoords(piece['loc'][0], piece['loc'][1], w_px, h_px, this.offsetX, this.offsetY, cWidth, cHeight, this.z);
+					var xy = wrapCoords(piece['loc'][0], piece['loc'][1]);
 					new Hex.Hexagon(id, player, xy[0], xy[1], w_px, h_px, this.z);
 				}
 			}
