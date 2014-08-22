@@ -317,75 +317,7 @@ class PeekSet(set):
 	def empty(self):
 		return len(self) == 0
 
-class Player:
-	def __init__(self, id, pieces, connection=None, home_node=None):
-		# I'm not sure how this will work yet, but a Player object
-		# should connect to an actual player
-		self.connection = connection
-		
-		# This is a turn_number:move dict
-			# Each move is a Piece:Instruction dict
-				# An instruction is a (string, loc) tuple,
-				# where the string can be "move" or "spawn"
-		self.moves = {}
 
-		# Set of Piece objects
-		self.pieces = pieces
-
-		# id, usually 'A' or 'B'
-		self.id = id
-
-		# atm I'm setting this after the player has already been constructed,
-		#  with Home.set_owner(player)
-		self.home_node=home_node
-
-	def __getitem__(self, arg):
-		if type(arg) == Node:
-			for piece in self.pieces:
-				if piece.loc == arg:
-					return piece
-			raise KeyError("Player {} doesn't seem to have a piece "\
-					"at location ({},{}).".format(self.id, *arg.coord))
-
-		if type(arg) == int:
-			arg = "{}{}".format(self.id, arg)
-
-		if type(arg) == unicode:
-			arg = arg.encode('ascii', 'ignore')
-
-		if type(arg) == str:
-			for piece in self.pieces:
-				if piece.id == arg:
-					return piece
-			raise KeyError("Player {} doesn't seem to have a"\
-					"pieces with id {}.".format(self.id, arg))
-
-		raise Exception("Attempted to call __getitem__ function of player {}" \
-				"with type {}".format(self.id, type(arg)))
-
-	def vision(self):
-		out = set()
-		for piece in self.pieces:
-			out.update(piece.vision())
-		return out
-
-
-	# Probably removing this as I change Piece IDs to actual names
-	# def get_next_id(self):
-	# 	current_ids = set([p.id for p in self.pieces])
-
-	# 	i = 0
-	# 	while True:
-	# 		if "{}{}".format(self.id, i) not in current_ids:
-	# 			return "{}{}".format(self.id, i)
-	# 		i += 1
-
-	def __repr__(self):
-		out = {}
-		out["type"] = "player"
-		out["num_pieces"] = len(self.pieces)
-		out["id"] = self.id
-		return json.dumps(out)
 
 # 
 # This represents any object that can appear within the "contents" of
