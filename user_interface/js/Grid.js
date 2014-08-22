@@ -85,7 +85,7 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 
 		console.log(centerX);
 		if (x > cWidth - moveX)
-			x -= self.total_width;
+			x -= self.total_width - 0.5 * w_px;
 
 		if (y > cHeight - moveY && (y - cHeight < 0))
 			y -= self.total_height;
