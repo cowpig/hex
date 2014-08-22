@@ -27,10 +27,11 @@ Game.Board.prototype.recenter = function(centerOnX, centerOnY) {
 
 Game.Board.prototype.draw = function(game_state, canvas) {
 
-	// console.log(canvas);
+	var cWidth = canvas[0].width;
+	var cHeight = canvas[0].height;
 
-	var centerX = canvas[0].width / 2;
-	var centerY = canvas[0].height / 2;
+	var centerX = cWidth / 2;
+	var centerY = cHeight / 2;
 
 	var w_px = canvas[0].width / (0.5 + this.num_x);
 	var h_px = w_px;
@@ -70,6 +71,19 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 	console.log("Translate back: (", centerX - this.offsetX, centerY - this.offsetY, ")");
 	ctx.translate(centerX - this.offsetX, centerY - this.offsetY);
 
+
+	var wrapCoords = function(xpos, ypos, w_hex, h_hex, offX, offY, w_c, h_c, z) {
+		var x = xpos * w_hex;
+		if (ypos % 2 === 1)
+			x += w_hex / 2;
+		var y = ypos * (h_hex - (h_hex-z)/2);
+
+		x = (x + offX) % w_c;
+		y = (y + offY) % h_c;
+
+		return [x,y];
+	}
+
 	for (var i in this.nodes){
 		var node = this.nodes[i];
 		var id = null;
@@ -78,7 +92,8 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 			id = this.homes[node.toString()];
 			// console.log("home at " + node.toString());
 		}
-		new Hex.Hexagon(id, null, node[0], node[1], w_px, h_px, this.z).draw(ctx);
+		var xy = wrapCoords(node[0], node[1], w_px, h_px, this.offsetX, this.offsetY, cWidth, cHeight, this.z);
+		new Hex.Hexagon(id, null, xy[0], xy[1], w_px, h_px, this.z).draw(ctx);
 	}
 
 	if (this.game_state){
@@ -86,7 +101,9 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 			if (game_state.hasOwnProperty(player)) {
 				for (var piece in game_state[player]) {
 					var id = player + "_" + piece['id'] + "_" + piece['r'];
-					new Hex.Hexagon(id, player, piece['loc'][0], piece['loc'][1], w_px, h_px, this.z);
+
+					var xy = wrapCoords(piece['loc'][0], piece['loc'][1], w_px, h_px, this.offsetX, this.offsetY, cWidth, cHeight, this.z);
+					new Hex.Hexagon(id, player, xy[0], xy[1], w_px, h_px, this.z);
 				}
 			}
 		}
@@ -96,6 +113,7 @@ Game.Board.prototype.draw = function(game_state, canvas) {
 
 		// TODO: visible range
 }
+
 
 
 
