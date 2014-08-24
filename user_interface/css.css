@@ -1,0 +1,59 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+body {
+	width: 100%;
+	height: 100%;
+}
+body > div{
+	position: fixed;
+}
+
+#status {
+	width: 25%;
+	right: 0;
+	height: calc(100% - 24px);
+	background-color:red;
+}
+
+#map {
+	left: 0;
+	top: 0;
+	background-color:blue;
+	height: calc(100% - 200px);
+	width: 75%;
+}
+
+#hexCanvas{
+	position:fixed;
+	top:0;
+	left:0;
+	bottom:0;
+	right:0;
+}
+
+#editor {
+	top: calc(100% - 200px);
+	height: 176px;
+	left: 0;
+	width: 75%;
+	background-color:yellow;
+}
+
+#toolbar {
+	left:0;
+	width:100%;
+	height:24px;
+	bottom:0;
+	background-color:green;
+}
+
+#toolbar a {
+	background-color:purple;
+}
+
+#codebox {
+	width:100%;
+	height:100%;
+}
