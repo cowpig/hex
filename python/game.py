@@ -155,6 +155,7 @@ class Game:
 		if players == None:
 			players = self.players
 			out["board"] = self.board.gui_output
+			out["ascii"] = self.board.__repr__()
 		else:
 			out["board"] = "{},{}".format(self.board.width, self.board.height)
 

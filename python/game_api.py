@@ -12,7 +12,7 @@ class GameApi(object):
 		self.connections = {"A" : A_conn, "B" : B_conn}
 		self.game = Game()
 
-	def repl(self, msg):
+	def repl_test(self, msg):
 		try:
 			exec msg
 		except Exception as e:
@@ -23,7 +23,11 @@ class GameApi(object):
 
 	def new_game(self, *args):
 		self.game = Game(*args)
-		return self.game.board.gui_output()
+
+		starting_state = self.game.get_game_state()
+
+		self.push_state(starting_state)
+		return self.game.get_game_state()
 
 	def make_opponent_moves(self, player):
 		make_nearly_random_moves(self.game.opponent(player), self.game, self.game.board)
@@ -33,7 +37,17 @@ class GameApi(object):
 		for player in self.game.players:
 			instructions = self.connections[player.id].read()
 			player.moves[turn] = parse_instructions(instructions)
+		
 		self.game.next_move()
+		new_state = self.game.get_game_state()
+
+		self.push_state(new_state)
+
+		return new_state
+
+	def push_state(self, gamestate):
+		for player_id, conn in self.connections:
+			conn.outfile.writeline(gamestate[player_id])
 
 	# parses a move input string
 	def parse_instructions(self, input_str):
