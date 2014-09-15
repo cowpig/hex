@@ -12,9 +12,15 @@ class Game:
 				moves={}):
 		logging.info("constructor called")
 		if board == None:
-			self.board = gl.Board(20,20)
-		else:
+			self.board = gl.Board(40,40)
+		elif isinstance(board, gl.Board):
 			self.board = board
+		elif type(board) == tuple:
+			self.board = gl.board(*board)
+		else:
+			raise AttributeError("The legal types for board parameter are: \
+									None (autosize), Tuple (size), Board (pre-defined)")
+
 		# list of players, currently only supporting two
 		self.players = players
 		self.turn = 0
