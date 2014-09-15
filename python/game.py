@@ -154,8 +154,19 @@ class Game:
 		out = {}
 		if players == None:
 			players = self.players
+			out["board"] = self.board.gui_output
+		else:
+			out["board"] = "{},{}".format(self.board.width, self.board.height)
+
 		for player in players:
-			out[player.id] = [p.__repr__() for p in player.pieces]
+			player = {
+						"pieces" : [p.__repr__() for p in player.pieces],
+						"home" : player.home_node.__repr__(),
+						"vision" : json.dumps({
+							str(node) : node.contents_string() for node in player.vision()
+						})
+					}
+			out[player.id] = json.dumps(player)
 
 		return json.dumps(out)
 
@@ -173,7 +184,8 @@ class Game:
 
 	# deprecated
 	def gui_output(self):
-		return json.dumps([self.gui_output_for_node(n) for n in self.board.nodes], separators=(',',':'))
+		return json.dumps([self.gui_output_for_node(n) for n in self.board.nodes], 
+							separators=(',',':'))
 
 def load_game(filename, go_to_turn=False):
 	with open(filename, 'rb') as f:

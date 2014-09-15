@@ -163,7 +163,8 @@ class Board:
 		out = {}
 		out['size'] = "{},{}".format(self.width, self.height)
 		out['nodes'] = [node.coord for node in self.nodes]
-		out['homes'] = {str(list(home.coord)):home.contents.peek().owner.id for home in self.home_nodes}
+		out['homes'] = {str(list(home.coord)):
+						home.contents.peek().owner.id for home in self.home_nodes}
 		return json.dumps(out)
 
 class Node:
@@ -228,6 +229,11 @@ class Node:
 			distance += 1
 			if len(next_to_check) == 0:
 				return None
+
+	def contents_string(self):
+		if len(contents) > 1:
+			raise Exception("len(contents)>1 at print-time:\n{}".format(self.contents))
+		return self.contents.peek().id if not self.contents.empty() else ""
 
 	def __getitem__(self, dir):
 		return self.dirs[dir]
