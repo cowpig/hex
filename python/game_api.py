@@ -1,8 +1,15 @@
 from game import Game, make_nearly_random_moves
+import io
+
+class PlayerConnection(object):
+	def __init__(self, infile, outfile, userID):
+		self.infile = io.FileIO(infile, "wb")
+		self.outfile = io.FileIO(outfile, "wb")
+		self.userID = userID
 
 class GameApi(object):
-	def __init__(self, msgfunc):
-		self.send = msgfunc
+	def __init__(self, A_conn, B_conn):
+		self.connections = {"A" : A_conn, "B" : B_conn}
 		self.game = Game()
 
 	def repl(self, msg):
@@ -22,20 +29,18 @@ class GameApi(object):
 		make_nearly_random_moves(self.game.opponent(player), self.game, self.game.board)
 
 	def next_move(self):
+		turn = self.game.turn
+		for player in self.game.players:
+			instructions = self.connections[player.id].read()
+			player.moves[turn] = parse_instructions(instructions)
 		self.game.next_move()
 
 	# parses a move input string
-	def parse_input(self, input):
-		if input == "newgame":
-			return "board&=" + self.new_game()
-
-		order_strings = input.split("\n")
-		moves = {}
-
-		for order_string in order_strings:
-			try:
-				piece_id, the_rest = order_string.split(".")
-				order, dest_str = the_rest.split(" ")
+	def parse_instructions(self, input_str):
+		try:
+			move_dict = json.loads(input_str)
+			for piece_id, order_string in move_dict:
+				order, dest_str = order_string.split(" ")
 
 				piece = player[piece_id]
 
@@ -53,11 +58,10 @@ class GameApi(object):
 
 				moves[piece] = (order, dest)
 
-			except Exception as e:
-				msg = "Error parsing order string:\n\t{}".format(order_string)
-				msg += "\nerror message:\n\t{}".format(e.message)
-				print msg
-				# raise Exception(msg)
-
-		player.moves[self.game.turn] = moves
-		return None
+		except Exception as e:
+			msg = "Error parsing order string:\n\t{}".format(order_string)
+			msg += "\nerror message:\n\t{}".format(e.message)
+			return None
+			# raise Exception(msg)
+		
+		return moves

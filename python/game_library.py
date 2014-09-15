@@ -324,11 +324,7 @@ class PeekSet(set):
 		return len(self) == 0
 
 class Player:
-	def __init__(self, id, pieces, connection=None, home_node=None):
-		# I'm not sure how this will work yet, but a Player object
-		# should connect to an actual player
-		self.connection = connection
-		
+	def __init__(self, id, pieces, home_node=None):
 		# This is a turn_number:move dict
 			# Each move is a Piece:Instruction dict
 				# An instruction is a (string, loc) tuple,
