@@ -15,8 +15,6 @@ if __name__ == "__main__":
 						help="output file for player A", metavar="FILE")
 	parser.add_option("-b_out", "--b_output", dest="filename",
 						help="output file for player B", metavar="FILE")
-
-
 	(options, args) = parser.parse_args()
 
 	connA = game_api.PlayerConnection(options['a_in'], options['a_out'])
@@ -26,7 +24,8 @@ if __name__ == "__main__":
 
 	# start a new game
 	starting_state = api.new_game()
-
+	print api.game.board
+	
 	# wait 3 seconds before first move
 	time.sleep(3)
 
@@ -37,5 +36,4 @@ if __name__ == "__main__":
 		time.sleep(0.3)
 
 	# update database with winner/loser/gamestate/etc
-
-	print "that's all she wrote!"
+	print "The game is over and the winner is player {}".format(api.game.winner.id)	

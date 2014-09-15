@@ -22,6 +22,7 @@ class Game:
 		self.illegal_move_penalty = 2
 		self.movement_cooldown = 3
 		self.game_over = False
+		self.winner = None
 
 		for i, player in enumerate(players):
 			# Set the home nodes for each player
@@ -142,6 +143,7 @@ class Game:
 		raise TypeError("opponent(p) can take a Player or Item as a parameter.")
 
 	def end_game(self, loser):
+		self.winner = self.opponent(loser)
 		self.game_over = True
 
 	# Assuming no bugs, only the player IDs would have to be saved, rather than their
