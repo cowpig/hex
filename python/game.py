@@ -168,16 +168,19 @@ class Game:
 			out["board"] = "{},{}".format(self.board.width, self.board.height)
 
 		for player in players:
+			homes = {player.id : player.home_node.__repr__()}
+			if self.opponent(player).home_node in player.vision:
+				homes[self.opponent(player).id] = self.opponent(player).home_node
 			player = {
 						"pieces" : [p.__repr__() for p in player.pieces],
-						"home" : player.home_node.__repr__(),
+						"homes" : homes,
 						"vision" : json.dumps({
 							str(node) : node.contents_string() for node in player.vision()
 						})
 					}
 			out[player.id] = json.dumps(player)
 
-		return json.dumps(out)
+		return out
 
 
 	# deprecated

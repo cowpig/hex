@@ -47,7 +47,7 @@ class GameApi(object):
 
 	def push_state(self, gamestate):
 		for player_id, conn in self.connections:
-			conn.outfile.writeline(gamestate[player_id])
+			conn.outfile.writeline(json.dumps({player_id : gamestate[player_id]}))
 
 	# parses a move input string
 	def parse_instructions(self, input_str):
@@ -55,7 +55,6 @@ class GameApi(object):
 			move_dict = json.loads(input_str)
 			for piece_id, order_string in move_dict:
 				order, dest_str = order_string.split(" ")
-
 				piece = player[piece_id]
 
 				# we will allow destinations to be given in one of two ways
