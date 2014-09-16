@@ -2,23 +2,30 @@ import game_api
 import time
 from optparse import OptionParser
 
-
+import example_player
 
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("", "--a_input", dest="filename",
+    parser.add_option("", "--a_input", dest="a_in",
                         help="input file for player A", metavar="FILE")
-    parser.add_option("", "--b_input", dest="filename",
+    parser.add_option("", "--b_input", dest="a_out",
                         help="input file for player B", metavar="FILE")
     
-    parser.add_option("", "--a_output", dest="filename",
+    parser.add_option("", "--a_output", dest="b_in",
                         help="output file for player A", metavar="FILE")
-    parser.add_option("", "--b_output", dest="filename",
+    parser.add_option("", "--b_output", dest="b_out",
                         help="output file for player B", metavar="FILE")
+
+    parser.add_option("-t", "--test", dest="test",
+                        help="test the game engine", action="store_true")
     (options, args) = parser.parse_args()
 
-    connA = game_api.PlayerConnection(options['a_input'], options['a_output'])
-    connB = game_api.PlayerConnection(options['b_input'], options['b_output'])
+    if options["test"]:
+        connA = game_api.MockConnection()
+        connB = game_api.MockConnection()
+    else:
+        connA = game_api.PlayerConnection(options['a_input'], options['a_output'])
+        connB = game_api.PlayerConnection(options['b_input'], options['b_output'])
 
     api = game_api.GameApi(connA, connB)
 

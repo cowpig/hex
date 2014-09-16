@@ -7,6 +7,18 @@ class PlayerConnection(object):
         self.outfile = io.FileIO(outfile, "wb")
         self.userID = userID
 
+class MockConnection(object):
+    def __init__(self, example_function):
+        self.func = example_function
+        self.moves = ""
+
+    def infile.read(self, gamestate):
+        return self.moves
+
+    def outfile.writeline(self)
+        self.moves = example_function(gamestate)
+
+
 class GameApi(object):
     def __init__(self, A_conn, B_conn):
         self.connections = {"A" : A_conn, "B" : B_conn}
@@ -35,7 +47,7 @@ class GameApi(object):
     def next_move(self):
         turn = self.game.turn
         for player in self.game.players:
-            instructions = self.connections[player.id].read()
+            instructions = self.connections[player.id].infile.read()
             player.moves[turn] = parse_instructions(instructions)
         
         self.game.next_move()
