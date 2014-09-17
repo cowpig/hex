@@ -55,7 +55,7 @@ class GameApi(object):
         turn = self.game.turn
         for player in self.game.players:
             instructions = self.connections[player.id].infile.read()
-            player.moves[turn] = parse_instructions(instructions)
+            player.moves[turn] = self.parse_instructions(instructions)
         
         self.game.next_move()
         new_state = self.game.get_game_state()
@@ -72,9 +72,15 @@ class GameApi(object):
     def parse_instructions(self, input_str):
         try:
             move_dict = json.loads(input_str)
-            for piece_id, order_string in move_dict:
-                order, dest_str = order_string.split(" ")
-                piece = player[piece_id]
+            for piece_id, order_string in move_dict.iteritems():
+                if order_string.startswith("move"):
+                    order = "move"
+                    dest_str = order_string[5:]
+                elif order_string.startswith("spawn"):
+                    order = "spawn"
+                    dest_str = order_string[6:]
+                else:
+                    raise Exception("order should start with 'move' or 'spawn'")
 
                 # we will allow destinations to be given in one of two ways
                 #   E-E-SE, for destinations relative to the node
@@ -88,12 +94,12 @@ class GameApi(object):
                     for direction in directions:
                         dest = dest[direction]
 
-                moves[piece] = (order, dest)
+                moves[piece_id] = (order, dest)
 
         except Exception as e:
-            msg = "Error parsing order string:\n\t{}".format(order_string)
+            msg = "Error parsing order string:\n\t{}".format(input_str)
             msg += "\nerror message:\n\t{}".format(e.message)
-            return None
-            # raise Exception(msg)
+            return {}
+            raise Exception(msg)
         
         return moves
