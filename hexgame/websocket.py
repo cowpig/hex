@@ -2,7 +2,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import tornado.httpserver
-from game_api import GameApi
+from api import GameApi
 
 # todo : assign connection to a player
 

@@ -1,4 +1,4 @@
-import game_library as gl
+import library as lib
 import cPickle
 import logging
 import random
@@ -8,15 +8,15 @@ import json
 class Game:
     def __init__(self, 
                 board=None, 
-                players=[gl.Player("A", gl.PeekSet()), gl.Player("B", gl.PeekSet())], 
+                players=[lib.Player("A", lib.PeekSet()), lib.Player("B", lib.PeekSet())], 
                 moves={}):
         logging.info("constructor called")
         if board == None:
-            self.board = gl.Board(40,40)
-        elif isinstance(board, gl.Board):
+            self.board = lib.Board(40,40)
+        elif isinstance(board, lib.Board):
             self.board = board
         elif type(board) == tuple:
-            self.board = gl.board(*board)
+            self.board = lib.board(*board)
         else:
             raise AttributeError("The legal types for board parameter are: \
                                     None (autosize), Tuple (size), Board (pre-defined)")
@@ -35,7 +35,7 @@ class Game:
             self.board.home_nodes[i].contents.peek().set_owner(player)
             # Create the starting pieces for each player
             for neighbor in self.board.home_nodes[i].dirs.values():
-                p = gl.Piece(neighbor, player)
+                p = lib.Piece(neighbor, player)
 
     def get_player(self, player_id):
         if not type(player_id) == str:
@@ -84,7 +84,7 @@ class Game:
                 else:
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "new_piece":
-                p_new = gl.Piece(order[1], p)
+                p_new = lib.Piece(order[1], p)
                 logging.info("\t{} created at ({},{})".format(p_new.id, *p_new.loc.coord))
 
         for order, loc in moves.values():
@@ -111,7 +111,7 @@ class Game:
         if (player1 in owners) and (player2 in owners):
             attackers = set()
             for item in loc.contents:
-                if isinstance(item, gl.Home):
+                if isinstance(item, lib.Home):
                     logging.info("Home base {} has been captured! "\
                         "The game is over.".format(item))
                     self.end_game(item.owner)
@@ -134,12 +134,12 @@ class Game:
             while len(loc.contents) > 1:
                 p1, p2 = loc.contents.peek(2)
                 logging.info("\tcombining pieces {} and {} at ({}, {})".format(p1.id, p2.id, *loc.coord))
-                gl.combine(p1, p2)
+                lib.combine(p1, p2)
 
     def opponent(self, player):
-        if isinstance(player, gl.Item):
+        if isinstance(player, lib.Item):
             player = item.owner
-        if isinstance(player, gl.Player):
+        if isinstance(player, lib.Player):
             if self.players[0] == player:
                 return self.players[1]
             elif self.players[1] == player:
@@ -203,7 +203,7 @@ def load_game(filename, go_to_turn=False):
     with open(filename, 'rb') as f:
         board, players, moves, turn = cPickle.load(filename)
     for player in players:
-        player.pieces = gl.PeekSet()
+        player.pieces = lib.PeekSet()
     game = Game(board, players, moves)
     if go_to_turn:
         for i in xrange(turn):
@@ -212,7 +212,7 @@ def load_game(filename, go_to_turn=False):
 
 
 def test_game():
-    b = gl.Board(40, 40)
+    b = lib.Board(40, 40)
     g = Game(b)
     g.log_to_terminal = True
     print b
@@ -272,8 +272,8 @@ def make_random_moves(player, game):
 # both players move completely randomly
 def random_game(store_gamelog=False):
     gamelog = []
-    b = gl.Board(20, 20)
-    g = Game(b, [gl.Player("A", gl.PeekSet()), gl.Player("B", gl.PeekSet())])
+    b = lib.Board(20, 20)
+    g = Game(b, [lib.Player("A", lib.PeekSet()), lib.Player("B", lib.PeekSet())])
     g.log_to_terminal = True
     print b
     p1, p2 = g.players
@@ -316,8 +316,8 @@ def make_nearly_random_moves(player, game, board):
 
 def dumb_game(store_gamelog=False):
     gamelog = []
-    b = gl.Board(20, 20)
-    g = Game(b, [gl.Player("A", gl.PeekSet()), gl.Player("B", gl.PeekSet())])
+    b = lib.Board(20, 20)
+    g = Game(b, [lib.Player("A", lib.PeekSet()), lib.Player("B", lib.PeekSet())])
     g.log_to_terminal = False
     print b
     p1, p2 = g.players
