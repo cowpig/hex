@@ -4,7 +4,6 @@ import logging
 import random
 import json
 
-
 class Game:
     def __init__(self, 
                 board=None, 
@@ -162,29 +161,28 @@ class Game:
         out = {}
         if players == None:
             players = self.players
-            out["board"] = self.board.gui_output
-            out["ascii"] = self.board.__repr__()
+            out["board"] = self.board.to_dict()
+            out["ascii"] = self.board.__str__()
         else:
-            out["board"] = "{},{}".format(self.board.width, self.board.height)
+            out["board"] = str((self.board.width, self.board.height))
 
         for player in players:
-            homes = {player.id : player.home_node.__repr__()}
+            homes = {player.id : str(player.home_node)}
             if self.opponent(player).home_node in player.vision():
                 homes[self.opponent(player).id] = self.opponent(player).home_node
             player_info = {
-                        "pieces" : [p.__repr__() for p in player.pieces],
+                        "pieces" : [p.to_dict() for p in player.pieces],
                         "homes" : homes,
-                        "vision" : json.dumps({
+                        "vision" : {
                             str(node) : node.contents_string() for node in player.vision()
-                        })
+                        }
                     }
-            out[player.id] = json.dumps(player_info)
+            out[player.id] = player_info
 
         return out
 
-
-    # deprecated
     def gui_output_for_node(self, node):
+        raise Exception("deprecated")
         out = {}
         out['coord'] = node.coord
         out['id'] = node.contents.peek().demo_id() if not node.contents.empty() else ""
@@ -194,8 +192,8 @@ class Game:
                 out['vis'] += player.id
         return out
 
-    # deprecated
     def gui_output(self):
+        raise Exception("deprecated")
         return json.dumps([self.gui_output_for_node(n) for n in self.board.nodes], 
                             separators=(',',':'))
 

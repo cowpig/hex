@@ -125,13 +125,21 @@ class Board:
         self[new_node.coord] = new_node
         self.nodes.add(new_node)
 
+    def to_dict(self):
+        out = {}
+        out['size'] = "{},{}".format(self.width, self.height)
+        out['nodes'] = [node.coord for node in self.nodes]
+        out['homes'] = {str(list(home.coord)):
+                        home.contents.peek().owner.id for home in self.home_nodes}
+        return out
+
     def __getitem__(self, coords):
         return self.grid[coords[0]][coords[1]]
 
     def __setitem__(self, coords, new_node):
         self.grid[coords[0]][coords[1]] = new_node
 
-    def __repr__(self):
+    def __str__(self):
         out = '  '
         for x in xrange(len(self.grid)):
             out = "{}{: >2}".format(out, x)
@@ -159,13 +167,8 @@ class Board:
             out += '\n'
         return out
 
-    def gui_output(self):
-        out = {}
-        out['size'] = "{},{}".format(self.width, self.height)
-        out['nodes'] = [node.coord for node in self.nodes]
-        out['homes'] = {str(list(home.coord)):
-                        home.contents.peek().owner.id for home in self.home_nodes}
-        return json.dumps(out)
+    def __repr__(self):
+        return json.dumps(self.to_dict())
 
 class Node:
     def __init__(self, coord, NE=None, E=None, SE=None, SW=None, W=None, NW=None):
@@ -235,6 +238,17 @@ class Node:
             raise Exception("len(contents)>1 at print-time:\n{}".format(self.contents))
         return self.contents.peek().id if not self.contents.empty() else ""
 
+    def to_dict(self):
+        out = {}
+        out['type'] = "node"
+        out['coord'] = self.coord
+        out['neighbors'] = self.num_neighbors()
+        out['contents'] = self.contents.peek().id if not self.contents.empty() else ""
+        return out
+
+    def __str__(self):
+        return str(self.coord)
+
     def __getitem__(self, dir):
         return self.dirs[dir]
 
@@ -242,12 +256,7 @@ class Node:
         self.dirs[dir] = other_node
 
     def __repr__(self):
-        out = {}
-        out['type'] = "node"
-        out['coord'] = self.coord
-        out['neighbors'] = self.num_neighbors()
-        out['contents'] = self.contents.peek().id if not self.contents.empty() else ""
-        return json.dumps(out)
+        return json.dumps(self.to_dict())
 
 #
 # Below are helper functions for the Board and Node classes
@@ -382,12 +391,15 @@ class Player:
     #           return "{}{}".format(self.id, i)
     #       i += 1
 
-    def __repr__(self):
+    def to_dict(self):
         out = {}
         out["type"] = "player"
         out["num_pieces"] = len(self.pieces)
         out["id"] = self.id
-        return json.dumps(out)
+        return out
+
+    def __repr__(self):
+        return json.dumps(self.to_dict())
 
 # 
 # This represents any object that can appear within the "contents" of
@@ -479,13 +491,16 @@ class Piece(Item):
     def demo_id(self):
         return "{}{}".format(self.owner.id, self.range)
 
-    def __repr__(self):
+    def to_dict(self):
         out = {}
         out['r'] = self.range
         out['id'] = self.id
         out['cd'] = self.cooldown
         out['loc'] = self.loc.coord
-        return json.dumps(out)
+        return out
+
+    def __repr__(self):
+        return json.dumps(self.to_dict())
 
 def combine_time(r):
     return (3+r) * 2

@@ -1,13 +1,11 @@
 import random
 import json
 
-def get_vision(piece_loc, other_locs):
+def vision_for_piece(piece_loc, vision):
     # TODO
-    return other_locs
+    return vision.keys()
 
 def next_move(gamestate):
-    import pdb; pdb.set_trace()
-
     state = json.loads(gamestate)
     my_id = state.keys()[0]
     state = state[my_id]
@@ -20,11 +18,9 @@ def next_move(gamestate):
     instructions = {}
     didspawn = False
 
-
-
-    for piece, piece_info in state["pieces"]:
+    for piece in state["pieces"]:
         # if the piece is on cooldown
-        if piece_info["cd"]:
+        if piece["cd"]:
             continue
         
         if not didspawn:
@@ -36,10 +32,10 @@ def next_move(gamestate):
         if opponent in state["homes"]:
             destination = state["homes"][opponent]
         else:
-            candidates = get_vision(piece_info["coord"], state["board"])
-            destination = random.sample(candidates,1)[0]
+            candidates = vision_for_piece(piece["loc"], state["vision"])
+            destination = random.choice(candidates)
 
-        instructions[piece] = "{} {}".format(order, destination)
+        instructions[piece["id"]] = "{} {}".format(order, destination)
 
     return json.dumps(instructions)
     
