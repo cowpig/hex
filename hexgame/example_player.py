@@ -6,7 +6,7 @@ def get_vision(piece_loc, other_locs):
     return other_locs
 
 def next_move(gamestate):
-    print gamestate
+    import pdb; pdb.set_trace()
 
     state = json.loads(gamestate)
     my_id = state.keys()[0]
@@ -19,6 +19,8 @@ def next_move(gamestate):
 
     instructions = {}
     didspawn = False
+
+
 
     for piece, piece_info in state["pieces"]:
         # if the piece is on cooldown

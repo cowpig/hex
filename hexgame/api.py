@@ -1,5 +1,6 @@
 from game import Game, make_nearly_random_moves
 import io
+import json
 
 class PlayerConnection(object):
     def __init__(self, infile, outfile, userID):
@@ -64,7 +65,7 @@ class GameApi(object):
         return new_state
 
     def push_state(self, gamestate):
-        for player_id, conn in self.connections:
+        for player_id, conn in self.connections.iteritems():
             conn.outfile.writeline(json.dumps({player_id : gamestate[player_id]}))
 
     # parses a move input string

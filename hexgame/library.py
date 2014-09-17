@@ -231,7 +231,7 @@ class Node:
                 return None
 
     def contents_string(self):
-        if len(contents) > 1:
+        if len(self.contents) > 1:
             raise Exception("len(contents)>1 at print-time:\n{}".format(self.contents))
         return self.contents.peek().id if not self.contents.empty() else ""
 

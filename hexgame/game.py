@@ -169,16 +169,16 @@ class Game:
 
         for player in players:
             homes = {player.id : player.home_node.__repr__()}
-            if self.opponent(player).home_node in player.vision:
+            if self.opponent(player).home_node in player.vision():
                 homes[self.opponent(player).id] = self.opponent(player).home_node
-            player = {
+            player_info = {
                         "pieces" : [p.__repr__() for p in player.pieces],
                         "homes" : homes,
                         "vision" : json.dumps({
                             str(node) : node.contents_string() for node in player.vision()
                         })
                     }
-            out[player.id] = json.dumps(player)
+            out[player.id] = json.dumps(player_info)
 
         return out
 
