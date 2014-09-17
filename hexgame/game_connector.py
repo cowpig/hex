@@ -1,6 +1,7 @@
 import game_api
 import time
 from optparse import OptionParser
+import example_player
 
 import example_player
 
@@ -20,12 +21,15 @@ if __name__ == "__main__":
                         help="test the game engine", action="store_true")
     (options, args) = parser.parse_args()
 
-    if options["test"]:
-        connA = game_api.MockConnection()
-        connB = game_api.MockConnection()
+    print dir(options)      
+
+    if options.test:
+        mockfile = game_api.MockFile(example_player.next_move)
+        connA = game_api.MockConnection(mockfile, mockfile, "A")
+        connB = game_api.MockConnection(mockfile, mockfile, "B")
     else:
-        connA = game_api.PlayerConnection(options['a_input'], options['a_output'])
-        connB = game_api.PlayerConnection(options['b_input'], options['b_output'])
+        connA = game_api.PlayerConnection(options['a_input'], options['a_output'], "A")
+        connB = game_api.PlayerConnection(options['b_input'], options['b_output'], "B")
 
     api = game_api.GameApi(connA, connB)
 

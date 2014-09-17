@@ -3,20 +3,26 @@ import io
 
 class PlayerConnection(object):
     def __init__(self, infile, outfile, userID):
-        self.infile = io.FileIO(infile, "wb")
+        self.infile = io.FileIO(infile, "rb")
         self.outfile = io.FileIO(outfile, "wb")
         self.userID = userID
 
 class MockConnection(object):
+    def __init__(self, infile, outfile, uid):
+        self.infile = infile
+        self.outfile = outfile
+        self.uid = uid
+
+class MockFile(object):
     def __init__(self, example_function):
-        self.func = example_function
-        self.moves = ""
+        self.example_function = example_function
+        self.fakefile = ""
 
-    def infile.read(self, gamestate):
-        return self.moves
+    def read(self):
+        return self.fakefile
 
-    def outfile.writeline(self)
-        self.moves = example_function(gamestate)
+    def writeline(self, string):
+        self.fakefile = self.example_function(string)
 
 
 class GameApi(object):
