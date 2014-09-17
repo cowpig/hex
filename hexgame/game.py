@@ -174,18 +174,24 @@ class Game:
             out["ascii"] = self.board.__str__()
 
         for player in players:
-            homes = {player.id : str(player.home_node)}
-            if self.opponent(player).home_node in player.vision():
-                homes[self.opponent(player).id] = self.opponent(player).home_node
-            player_info = {
-                        "pieces" : [p.to_dict() for p in player.pieces],
-                        "homes" : homes,
-                        "vision" : {
-                            str(node) : node.contents_string() for node in player.vision()
-                        },
-                        "board" : str((self.board.width, self.board.height))
-                    }
-            out[player.id] = player_info
+            if self.game_over:
+                if player.id == self.winner:
+                    out[player.id] = "game over; you win!"
+                else:
+                    out[player.id] = "game over; you lose :("
+            else:
+                homes = {player.id : str(player.home_node)}
+                if self.opponent(player).home_node in player.vision():
+                    homes[self.opponent(player).id] = self.opponent(player).home_node
+                player_info = {
+                            "pieces" : [p.to_dict() for p in player.pieces],
+                            "homes" : homes,
+                            "vision" : {
+                                str(node) : node.contents_string() for node in player.vision()
+                            },
+                            "board" : str((self.board.width, self.board.height))
+                        }
+                out[player.id] = player_info
 
         return out
 

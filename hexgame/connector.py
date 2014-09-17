@@ -1,9 +1,6 @@
 import api
 import time
 from optparse import OptionParser
-import example_player
-
-import example_player
 
 if __name__ == "__main__":
     parser = OptionParser()
@@ -22,6 +19,7 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     if options.test:
+        from player import example_player
         mockfileA = api.MockFile(example_player.next_move)
         mockfileB = api.MockFile(example_player.next_move)
         connA = api.MockConnection(mockfileA, mockfileA, "A")
