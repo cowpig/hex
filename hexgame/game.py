@@ -7,9 +7,16 @@ import json
 class Game:
     def __init__(self, 
                 board=None, 
-                players=[lib.Player("A", lib.PeekSet()), lib.Player("B", lib.PeekSet())], 
-                moves={}):
+                players=None, 
+                moves=None,
+                logger_level=logging.INFO):
+        logging.root.setLevel(logger_level)
         logging.info("constructor called")
+        if players == None:
+            players = [lib.Player("A", lib.PeekSet()), lib.Player("B", lib.PeekSet())]
+        if moves == None:
+            moves = {}
+
         if board == None:
             self.board = lib.Board(40,40)
         elif isinstance(board, lib.Board):
@@ -29,12 +36,14 @@ class Game:
         self.game_over = False
         self.winner = None
 
-        for i, player in enumerate(players):
-            # Set the home nodes for each player
-            self.board.home_nodes[i].contents.peek().set_owner(player)
-            # Create the starting pieces for each player
-            for neighbor in self.board.home_nodes[i].dirs.values():
+        for player, home_node in zip(self.players, self.board.home_nodes):
+            # Set the home nodes
+            home_node.contents.peek().set_owner(player)
+            
+            # Create the starting pieces
+            for neighbor in home_node.neighbors():
                 p = lib.Piece(neighbor, player)
+                logging.info("created {} at {} for {}".format(p.id, neighbor, player.id))
 
     def get_player(self, player_id):
         if not type(player_id) == str:
@@ -57,6 +66,8 @@ class Game:
         if self.turn in player2.moves:
             moves.update(player2.moves[self.turn])
         
+        for player in self.players:
+            print player.moves
         # Keep track of all moves so they can be saved to disk
         self.moves[self.turn] = moves
 
@@ -163,8 +174,6 @@ class Game:
             players = self.players
             out["board"] = self.board.to_dict()
             out["ascii"] = self.board.__str__()
-        else:
-            out["board"] = str((self.board.width, self.board.height))
 
         for player in players:
             homes = {player.id : str(player.home_node)}
@@ -175,7 +184,8 @@ class Game:
                         "homes" : homes,
                         "vision" : {
                             str(node) : node.contents_string() for node in player.vision()
-                        }
+                        },
+                        "board" : str((self.board.width, self.board.height))
                     }
             out[player.id] = player_info
 

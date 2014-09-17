@@ -29,7 +29,7 @@ class MockFile(object):
 class GameApi(object):
     def __init__(self, A_conn, B_conn):
         self.connections = {"A" : A_conn, "B" : B_conn}
-        self.game = Game()
+        self.game = None
 
     def repl_test(self, msg):
         try:
@@ -52,10 +52,19 @@ class GameApi(object):
         make_nearly_random_moves(self.game.opponent(player), self.game, self.game.board)
 
     def next_move(self):
+        print "next move..."
+        print "A"
+        for piece in self.game.get_game_state()["A"]["pieces"]:
+            print piece["id"], piece["loc"]
+        print "B"
+        for piece in self.game.get_game_state()["B"]["pieces"]:
+            print piece["id"], piece["loc"]
+
         turn = self.game.turn
         for player in self.game.players:
             instructions = self.connections[player.id].infile.read()
-            player.moves[turn] = self.parse_instructions(instructions)
+            print instructions
+            player.moves[turn] = self.parse_instructions(player, instructions)
         
         self.game.next_move()
         new_state = self.game.get_game_state()
@@ -69,10 +78,13 @@ class GameApi(object):
             conn.outfile.writeline(json.dumps({player_id : gamestate[player_id]}))
 
     # parses a move input string
-    def parse_instructions(self, input_str):
+    def parse_instructions(self, player, input_str):
+        moves = {}
         try:
             move_dict = json.loads(input_str)
             for piece_id, order_string in move_dict.iteritems():
+                piece = player[piece_id]
+
                 if order_string.startswith("move"):
                     order = "move"
                     dest_str = order_string[5:]
@@ -94,12 +106,13 @@ class GameApi(object):
                     for direction in directions:
                         dest = dest[direction]
 
-                moves[piece_id] = (order, dest)
+                moves[piece] = (order, dest)
 
         except Exception as e:
             msg = "Error parsing order string:\n\t{}".format(input_str)
             msg += "\nerror message:\n\t{}".format(e.message)
-            return {}
             raise Exception(msg)
+            print msg
+            return {}
         
         return moves

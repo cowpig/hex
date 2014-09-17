@@ -39,10 +39,13 @@ if __name__ == "__main__":
     time.sleep(3)
 
     while not api.game.game_over:
-        api.next_move()
-        print api.game.board
-        # 0.3 seconds per move
-        time.sleep(0.3)
+        try:
+            api.next_move()
+            print api.game.board
+            # 0.3 seconds per move
+            time.sleep(0.3)
+        except KeyboardInterrupt:
+            import pdb; pdb.set_trace()
 
     # update database with winner/loser/gamestate/etc
     print "The game is over and the winner is player {}".format(api.game.winner.id) 
