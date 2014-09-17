@@ -368,7 +368,7 @@ class Player:
             for piece in self.pieces:
                 if piece.id == arg:
                     return piece
-            raise KeyError("Player {} doesn't seem to have a"\
+            raise KeyError("Player {} doesn't seem to have any "\
                     "pieces with id {}.".format(self.id, arg))
 
         raise Exception("Attempted to call __getitem__ function of player {}" \
