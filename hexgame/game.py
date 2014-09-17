@@ -9,7 +9,7 @@ class Game:
                 board=None, 
                 players=None, 
                 moves=None,
-                logger_level=logging.INFO):
+                logger_level=logging.CRITICAL):
         logging.root.setLevel(logger_level)
         logging.info("constructor called")
         if players == None:
@@ -24,8 +24,8 @@ class Game:
         elif type(board) == tuple:
             self.board = lib.board(*board)
         else:
-            raise AttributeError("The legal types for board parameter are: \
-                                    None (autosize), Tuple (size), Board (pre-defined)")
+            raise AttributeError("The legal types for board parameter are: "\
+                                    "None (autosize), Tuple (size), Board (pre-defined)")
 
         # list of players, currently only supporting two
         self.players = players
@@ -66,8 +66,6 @@ class Game:
         if self.turn in player2.moves:
             moves.update(player2.moves[self.turn])
         
-        for player in self.players:
-            print player.moves
         # Keep track of all moves so they can be saved to disk
         self.moves[self.turn] = moves
 
@@ -86,7 +84,7 @@ class Game:
             elif order[0] == "spawn":
                 # TODO: I think this needs some improvement
                 if p.can_move_to(order[1]):
-                    p.cooldown = spawn_time(p.range)
+                    p.cooldown = lib.spawn_time(p.range)
                     # only one piece can be created per player per turn
                     if self.turn+p.cooldown not in self.moves:
                         self.moves[self.turn+p.cooldown] = {}

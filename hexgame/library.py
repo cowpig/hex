@@ -437,7 +437,7 @@ class Piece(Item):
 
     def __init__(self, loc, owner, id=None, range=1, cooldown=0):
         if id == None:
-            id = Piece.names.pop(random.randint(0,len(Piece.names)))
+            id = Piece.names.pop(random.randrange(0,len(Piece.names)))
 
         super(Piece, self).__init__(loc, owner, id)
         # Distance, in hexes, that this Piece can see or move
@@ -455,6 +455,7 @@ class Piece(Item):
     def remove(self):
         self.owner.pieces.remove(self)
         self.loc.contents.remove(self)
+        Piece.names.append(self.id)
 
     def can_move_to(self, loc):
         if self.cooldown != 0:

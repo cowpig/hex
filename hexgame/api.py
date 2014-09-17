@@ -52,18 +52,19 @@ class GameApi(object):
         make_nearly_random_moves(self.game.opponent(player), self.game, self.game.board)
 
     def next_move(self):
-        print "next move..."
-        print "A"
-        for piece in self.game.get_game_state()["A"]["pieces"]:
-            print piece["id"], piece["loc"]
-        print "B"
-        for piece in self.game.get_game_state()["B"]["pieces"]:
-            print piece["id"], piece["loc"]
+        # print "next move..."
+        # print "A"
+        # for piece in self.game.get_game_state()["A"]["pieces"]:
+        #     print piece["id"], piece["loc"]
+        # print "B"
+        # for piece in self.game.get_game_state()["B"]["pieces"]:
+        #     print piece["id"], piece["loc"]
 
         turn = self.game.turn
         for player in self.game.players:
             instructions = self.connections[player.id].infile.read()
-            print instructions
+            # print "read from player ", player.id
+            # print instructions
             player.moves[turn] = self.parse_instructions(player, instructions)
         
         self.game.next_move()
@@ -75,6 +76,8 @@ class GameApi(object):
 
     def push_state(self, gamestate):
         for player_id, conn in self.connections.iteritems():
+            # print "sending to player", player_id
+            # print json.dumps({player_id : gamestate[player_id]})
             conn.outfile.writeline(json.dumps({player_id : gamestate[player_id]}))
 
     # parses a move input string
