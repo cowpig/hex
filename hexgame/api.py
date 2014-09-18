@@ -78,7 +78,10 @@ class GameApi(object):
         for player_id, conn in self.connections.iteritems():
             # print "sending to player", player_id
             # print json.dumps({player_id : gamestate[player_id]})
-            conn.outfile.writeline(json.dumps({player_id : gamestate[player_id]}))
+            try:
+                conn.outfile.writeline(json.dumps({player_id : gamestate[player_id]}))
+            except:
+                import pdb; pdb.set_trace()
 
     # parses a move input string
     def parse_instructions(self, player, input_str):

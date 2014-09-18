@@ -182,7 +182,7 @@ class Game:
             else:
                 homes = {player.id : str(player.home_node)}
                 if self.opponent(player).home_node in player.vision():
-                    homes[self.opponent(player).id] = self.opponent(player).home_node
+                    homes[self.opponent(player).id] = str(self.opponent(player).home_node)
                 player_info = {
                             "pieces" : [p.to_dict() for p in player.pieces],
                             "homes" : homes,
