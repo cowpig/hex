@@ -80,8 +80,8 @@ class GameApi(object):
             # print json.dumps({player_id : gamestate[player_id]})
             try:
                 conn.outfile.writeline(json.dumps({player_id : gamestate[player_id]}))
-            except:
-                import pdb; pdb.set_trace()
+            except Exception as e:
+                print e
 
     # parses a move input string
     def parse_instructions(self, player, input_str):

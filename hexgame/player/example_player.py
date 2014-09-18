@@ -54,6 +54,7 @@ def vision_for_piece(piece, loc_dict, board_size):
 
 def next_move(gamestate):
     state = json.loads(gamestate)
+
     my_id = state.keys()[0]
     state = state[my_id]
 
