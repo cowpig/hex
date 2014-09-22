@@ -2,14 +2,14 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import tornado.httpserver
-from api import GameApi
+from demo import DemoAPI
 
 # todo : assign connection to a player
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print 'new connection'
-        self.api = GameApi(self.write_message)
+        self.api = DemoAPI(self.write_message)
         print self.api.game.board
     
     def on_message(self, message):

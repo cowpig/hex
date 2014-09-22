@@ -8,7 +8,6 @@ var canvas;
 
 
 function init() { 
-	console.log("also herr");
 	statusBar = document.getElementById("status");
 	if (!'WebSocket' in window){
 		console.log ("no websocket");
@@ -79,4 +78,4 @@ function moveMap(e) {
 
 
 $("document").ready(init);
-$(window).resize(resizeCanvas);
+// $(window).resize(resizeCanvas);

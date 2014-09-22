@@ -18,7 +18,7 @@ class Game:
             moves = {}
 
         if board == None:
-            self.board = lib.Board(20,20)
+            self.board = lib.Board(40,40)
         elif isinstance(board, lib.Board):
             self.board = board
         elif type(board) == tuple:
