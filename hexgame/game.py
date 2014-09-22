@@ -95,7 +95,7 @@ class Game:
                         .format(p.id, p.cooldown, p.cooldown+self.illegal_move_penalty))
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "new_piece":
-                p_new = lib.Piece(order[1], p)
+                p_new = lib.Piece(order[1], p.owner)
                 spawns.append(p_new)
                 logging.info("\t{} created at ({},{})".format(p_new.id, *p_new.loc.coord))
 
