@@ -9,7 +9,7 @@ class Game:
                 board=None, 
                 players=None, 
                 moves=None,
-                logger_level=logging.CRITICAL):
+                logger_level=logging.INFO):
         logging.root.setLevel(logger_level)
         logging.info("constructor called")
         if players == None:
@@ -68,6 +68,8 @@ class Game:
         
         # Keep track of all moves so they can be saved to disk
         self.moves[self.turn] = moves
+        # keep track of spawn points for move resolution phase
+        spawns = []
 
         for p, order in moves.iteritems():
             logging.info("Executing order:{}.{}({},{})".format(p.id, order[0], *order[1].coord))
@@ -82,22 +84,24 @@ class Game:
                         .format(p.id, p.cooldown, p.cooldown+self.illegal_move_penalty))
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "spawn":
-                # TODO: I think this needs some improvement
                 if p.can_move_to(order[1]):
                     p.cooldown = lib.spawn_time(p.range)
                     # only one piece can be created per player per turn
                     if self.turn+p.cooldown not in self.moves:
                         self.moves[self.turn+p.cooldown] = {}
-                    self.moves[self.turn+p.cooldown][p.owner] = ("new_piece", order[1])
+                    self.moves[self.turn+p.cooldown][p] = ("new_piece", order[1])
                 else:
+                    logging.info("\tIllegal spawn detected. {}.cooldown {}->{}"\
+                        .format(p.id, p.cooldown, p.cooldown+self.illegal_move_penalty))
                     p.cooldown += self.illegal_move_penalty
             elif order[0] == "new_piece":
                 p_new = lib.Piece(order[1], p)
+                spawns.append(p_new)
                 logging.info("\t{} created at ({},{})".format(p_new.id, *p_new.loc.coord))
 
         for order, loc in moves.values():
             if len(loc.contents) > 1:
-                self.resolve(loc, moves)
+                self.resolve(loc, moves, spawns)
 
         # decrement all the cooldowns
         for piece in player1.pieces:
@@ -109,7 +113,7 @@ class Game:
 
         self.turn += 1
 
-    def resolve(self, loc, moves):
+    def resolve(self, loc, moves, spawns):
         logging.info("Resolving conflict at ({},{})".format(*loc.coord))
         to_remove = set()
         
@@ -124,12 +128,16 @@ class Game:
                         "The game is over.".format(item))
                     self.end_game(item.owner)
                     return
-                if item in moves:
-                    logging.info("\t{} moved this turn; {} is registered as an attacker"\
+                if (item in moves) or (item in spawns):
+                    logging.info("\t{} moved/spawned this turn; {} is registered as an attacker"\
                         .format(item.id, item.owner.id))
                     attackers.add(item.owner)
+                else:
+                    # if we add obtainable items, this is where we can add code to pick them up
+                    logging.info("\t{} is a sitting duck!".format(item.id))
 
             for item in loc.contents:
+                # remove everything that's under attack (mexican standoffs galore!)
                 if self.opponent(item.owner) in attackers:
                     to_remove.add(item)
 

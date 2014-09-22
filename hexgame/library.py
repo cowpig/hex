@@ -235,6 +235,7 @@ class Node:
 
     def contents_string(self):
         if len(self.contents) > 1:
+            print self.contents
             import pdb; pdb.set_trace()
             raise Exception("len(contents)>1 at print-time:\n{}".format(self.contents))
         return self.contents.peek().id if not self.contents.empty() else ""
