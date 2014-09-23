@@ -1,4 +1,4 @@
-execfile("player.py")
+execfile("/codebin/player.py")
 
 if __name__ == "__main__":
 	print "I am starting up..."
