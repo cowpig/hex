@@ -23,4 +23,4 @@ will open a server that will interact with `user_interface/hex_grid_demo.html`, 
 
 ## TODO: Web Backend ##
 
-Eventually, this will interact with ![codebin](https://github.com/surenm/codebin), so that players of the game can upload code, get paired with another player, and watch the game being played out. ![codebin](https://github.com/surenm/codebin) creates docker containers limited to a single cpu core and limited memory for each player, to create a safe (for the server) and balanced (for the players) environment to run the players' AIs.
+Eventually, this will interact with [codebin](https://github.com/surenm/codebin), so that players of the game can upload code, get paired with another player, and watch the game being played out. [codebin](https://github.com/surenm/codebin) creates docker containers limited to a single cpu core and limited memory for each player, to create a safe (for the server) and balanced (for the players) environment to run the players' AIs.
