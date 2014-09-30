@@ -34,12 +34,15 @@ def offset(coord, dir, xmax, ymax):
         else:
             raise Exception("Must specify a valid direction.")
 
+
+# returns a list of nodes that are within one hexagon of a given piece
 def vision_for_piece(piece, loc_dict, board_size):
     out = set()
+    
+    # not actually using range atm
+    piece_range = piece["r"]
 
     piece_loc = piece["loc"]
-    # not using range atm
-    piece_range = piece["r"]
     board_size = eval(board_size)
 
     possible_dirs = ["NE", "E", "SE", "SW", "W", "NW"]
@@ -52,13 +55,19 @@ def vision_for_piece(piece, loc_dict, board_size):
 
     return list(out)
 
+# given a gamestate, return a json object that looks like this:
+#   {
+#       'piece_id' : 'order (destination)'
+#   }
+# where:
+#   piece_id is the id of a piece (shockingly!)
+#   order can be "move" or "spawn"
+#   and destination is the (x, y) coordinates of a target node
 def next_move(gamestate):
     state = json.loads(gamestate)
 
     my_id = state.keys()[0]
     state = state[my_id]
-
-    # print state.keys()
 
     if my_id == "A":
         opponent = "B"
