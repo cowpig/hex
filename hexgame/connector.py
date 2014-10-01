@@ -33,8 +33,8 @@ if __name__ == "__main__":
         connA = api.PlayerConnection(in_a, out_a, "A")
         connB = api.PlayerConnection(in_b, out_b, "B")
     else:
-        connA = api.PlayerConnection(options['a_input'], options['a_output'], "A")
-        connB = api.PlayerConnection(options['b_input'], options['b_output'], "B")
+        connA = api.PlayerConnection(options.a_in, options.a_out, "A")
+        connB = api.PlayerConnection(options.b_in, options.b_out, "B")
 
     api = api.GameApi(connA, connB)
 
