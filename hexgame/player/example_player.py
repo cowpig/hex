@@ -1,5 +1,8 @@
 import random
 import json
+import os.path
+import os
+import sys
 
 # returns a grid coord (x, y) offset by one unit in the given direction
 def offset(coord, dir, xmax, ymax):
@@ -55,6 +58,16 @@ def vision_for_piece(piece, loc_dict, board_size):
 
     return list(out)
 
+def wait_read_delete(filename):
+    while not os.path.isfile(filename):
+        continue
+    with open(filename) as f:
+        gamestate = f.read()
+    
+    os.remove(filename)
+    return gamestate
+
+
 # given a gamestate, return a json object that looks like this:
 #   {
 #       'piece_id' : 'order (destination)'
@@ -63,38 +76,44 @@ def vision_for_piece(piece, loc_dict, board_size):
 #   piece_id is the id of a piece (shockingly!)
 #   order can be "move" or "spawn"
 #   and destination is the (x, y) coordinates of a target node
-def next_move(gamestate):
-    state = json.loads(gamestate)
+def play_game(input_filename, output_filename):
 
-    my_id = state.keys()[0]
-    state = state[my_id]
+    while True:
+        gamestate = wait_read_delete(input_filename)
 
-    if my_id == "A":
-        opponent = "B"
-    else:
-        opponent = "A"
+        state = json.loads(gamestate)
 
-    instructions = {}
-    didspawn = False
+        my_id = state.keys()[0]
+        state = state[my_id]
 
-    for piece in state["pieces"]:
-        # if the piece is on cooldown
-        if piece["cd"]:
-            continue
-        
-        if not didspawn:
-            order = random.choice(['move', 'spawn'])
-            didspawn = True
+        if my_id == "A":
+            opponent = "B"
         else:
-            order = 'move'
+            opponent = "A"
 
-        if opponent in state["homes"]:
-            destination = state["homes"][opponent]
-        else:
-            candidates = vision_for_piece(piece, state["vision"], state["board"])
-            destination = random.choice(candidates)
+        instructions = {}
+        didspawn = False
 
-        instructions[piece["id"]] = "{} {}".format(order, destination)
+        for piece in state["pieces"]:
+            # if the piece is on cooldown
+            if piece["cd"]:
+                continue
+            
+            if not didspawn:
+                order = random.choice(['move', 'spawn'])
+                didspawn = True
+            else:
+                order = 'move'
 
-    return json.dumps(instructions)
-    
+            if opponent in state["homes"]:
+                destination = state["homes"][opponent]
+            else:
+                candidates = vision_for_piece(piece, state["vision"], state["board"])
+                destination = random.choice(candidates)
+
+            instructions[piece["id"]] = "{} {}".format(order, destination)
+
+        with open(output_filename, "w") as f:
+            f.write(json.dumps(instructions))
+
+play_game(sys.argv[1], sys.argv[2])

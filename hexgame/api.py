@@ -4,27 +4,24 @@ import json
 
 class PlayerConnection(object):
     def __init__(self, infile, outfile, userID):
-        self.infile = io.FileIO(infile, "rb")
-        self.outfile = io.FileIO(outfile, "wb")
-        self.userID = userID
-
-class MockConnection(object):
-    def __init__(self, infile, outfile, uid):
         self.infile = infile
         self.outfile = outfile
-        self.uid = uid
-
-class MockFile(object):
-    def __init__(self, example_function):
-        self.example_function = example_function
-        self.fakefile = ""
+        self.userID = userID
 
     def read(self):
-        return self.fakefile
+        try:
+            with open(infile, "rb") as f:
+                return f.read()
+        except Exception as e:
+            print "error reading file {} :\n{}".format(infile, e)
+            return ""
 
-    def writeline(self, string):
-        self.fakefile = self.example_function(string)
-
+    def write(self, string):
+        try:
+            with open(outfile, "wb") as f:
+                f.write(string)
+        except Exception as e:
+            print "error writing to file {} :\n{}".format(infile, e)
 
 class GameApi(object):
     def __init__(self, A_conn, B_conn):
@@ -62,7 +59,7 @@ class GameApi(object):
 
         turn = self.game.turn
         for player in self.game.players:
-            instructions = self.connections[player.id].infile.read()
+            instructions = self.connections[player.id].read()
             # print "read from player ", player.id
             # print instructions
             player.moves[turn] = self.parse_instructions(player, instructions)
@@ -78,10 +75,8 @@ class GameApi(object):
         for player_id, conn in self.connections.iteritems():
             # print "sending to player", player_id
             # print json.dumps({player_id : gamestate[player_id]})
-            try:
-                conn.outfile.writeline(json.dumps({player_id : gamestate[player_id]}))
-            except Exception as e:
-                print e
+            conn.write(json.dumps({player_id : gamestate[player_id]}))
+
 
     # parses a move input string
     def parse_instructions(self, player, input_str):

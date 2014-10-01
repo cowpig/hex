@@ -19,11 +19,8 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     if options.test:
-        from player import example_player
-        mockfileA = api.MockFile(example_player.next_move)
-        mockfileB = api.MockFile(example_player.next_move)
-        connA = api.MockConnection(mockfileA, mockfileA, "A")
-        connB = api.MockConnection(mockfileB, mockfileB, "B")
+        connA = api.PlayerConnection(mockfileA, mockfileA, "A")
+        connB = api.PlayerConnection(mockfileB, mockfileB, "B")
     else:
         connA = api.PlayerConnection(options['a_input'], options['a_output'], "A")
         connB = api.PlayerConnection(options['b_input'], options['b_output'], "B")
