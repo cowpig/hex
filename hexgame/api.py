@@ -3,26 +3,26 @@ import io
 import json
 
 class PlayerConnection(object):
-    def __init__(self, infile, outfile, userID):
-        self.infile = infile
-        self.outfile = outfile
+    def __init__(self, statefile, orderfile, userID):
+        self.statefile = statefile
+        self.orderfile = orderfile
         self.userID = userID
 
     def read(self):
         try:
-            with open(self.infile, "rb") as f:
+            with open(self.statefile, "rb") as f:
                 return f.read()
         except Exception as e:
-            print "error reading file {} :\n{}".format(self.infile, e)
+            print "error reading file {} :\n{}".format(self.statefile, e)
             return ""
 
     def write(self, string):
         try:
-            with open(self.outfile, "wb") as f:
+            with open(self.orderfile, "wb") as f:
                 f.write(string)
             print string, "written to {}".format(f)
         except Exception as e:
-            print "error writing to file {} :\n{}".format(self.infile, e)
+            print "error writing to file {} :\n{}".format(self.statefile, e)
 
 class GameApi(object):
     def __init__(self, A_conn, B_conn):

@@ -79,10 +79,10 @@ def wait_read_delete(filename):
 #   piece_id is the id of a piece (shockingly!)
 #   order can be "move" or "spawn"
 #   and destination is the (x, y) coordinates of a target node
-def play_game(input_filename, output_filename):
+def play_game(state_filename, orders_filename):
 
     while True:
-        gamestate = wait_read_delete(input_filename)
+        gamestate = wait_read_delete(state_filename)
 
         try:
             state = json.loads(gamestate)
@@ -119,7 +119,7 @@ def play_game(input_filename, output_filename):
 
             instructions[piece["id"]] = "{} {}".format(order, destination)
 
-        with open(output_filename, "w") as f:
+        with open(orders_filename, "w") as f:
             f.write(json.dumps(instructions))
 
 play_game(sys.argv[1], sys.argv[2])

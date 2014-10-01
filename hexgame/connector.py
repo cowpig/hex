@@ -4,15 +4,15 @@ from optparse import OptionParser
 
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("", "--a_input", dest="a_in",
-                        help="input file for player A", metavar="FILE")
-    parser.add_option("", "--b_input", dest="a_out",
-                        help="input file for player B", metavar="FILE")
+    parser.add_option("", "--a_ord", dest="a_ord",
+                        help="orders file for player A", metavar="FILE")
+    parser.add_option("", "--b_ord", dest="b_ord",
+                        help="orders file for player B", metavar="FILE")
     
-    parser.add_option("", "--a_output", dest="b_in",
-                        help="output file for player A", metavar="FILE")
-    parser.add_option("", "--b_output", dest="b_out",
-                        help="output file for player B", metavar="FILE")
+    parser.add_option("", "--a_state", dest="b_state",
+                        help="gamestate file for player A", metavar="FILE")
+    parser.add_option("", "--b_state", dest="b_state",
+                        help="gamestate file for player B", metavar="FILE")
 
     parser.add_option("-t", "--test", dest="test",
                         help="test the game engine", action="store_true")
@@ -20,21 +20,21 @@ if __name__ == "__main__":
 
     if options.test:
         import subprocess, os
-        in_a = "in_a.txt"
-        in_b = "in_b.txt"
-        out_a = "out_a.txt"
-        out_b = "out_b.txt"
+        orders_a = "orders_a.txt"
+        orders_b = "orders_b.txt"
+        state_a = "state_a.txt"
+        state_b = "state_b.txt"
 
         player = os.path.join(os.path.dirname(__file__), "player/example_player.py")
 
-        proc_a = subprocess.Popen(["python", player, out_a, in_a])
-        proc_b = subprocess.Popen(["python", player, out_b, in_b])
+        proc_a = subprocess.Popen(["python", player, orders_a, state_a])
+        proc_b = subprocess.Popen(["python", player, orders_b, state_b])
 
-        connA = api.PlayerConnection(in_a, out_a, "A")
-        connB = api.PlayerConnection(in_b, out_b, "B")
+        connA = api.PlayerConnection(orders_a, out_a, "A")
+        connB = api.PlayerConnection(orders_b, out_b, "B")
     else:
-        connA = api.PlayerConnection(options.a_in, options.a_out, "A")
-        connB = api.PlayerConnection(options.b_in, options.b_out, "B")
+        connA = api.PlayerConnection(options.a_ord, options.a_out, "A")
+        connB = api.PlayerConnection(options.b_ord, options.b_out, "B")
 
     api = api.GameApi(connA, connB)
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     print api.game.board
     
     # wait 3 seconds before first move
-    time.sleep(3)
+    time.sleep()
 
     while not api.game.game_over:
         try:
