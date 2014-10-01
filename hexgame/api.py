@@ -10,18 +10,18 @@ class PlayerConnection(object):
 
     def read(self):
         try:
-            with open(infile, "rb") as f:
+            with open(self.infile, "rb") as f:
                 return f.read()
         except Exception as e:
-            print "error reading file {} :\n{}".format(infile, e)
+            print "error reading file {} :\n{}".format(self.infile, e)
             return ""
 
     def write(self, string):
         try:
-            with open(outfile, "wb") as f:
+            with open(self.outfile, "wb") as f:
                 f.write(string)
         except Exception as e:
-            print "error writing to file {} :\n{}".format(infile, e)
+            print "error writing to file {} :\n{}".format(self.infile, e)
 
 class GameApi(object):
     def __init__(self, A_conn, B_conn):
@@ -112,7 +112,7 @@ class GameApi(object):
         except Exception as e:
             msg = "Error parsing order string:\n\t{}".format(input_str)
             msg += "\nerror message:\n\t{}".format(e.message)
-            raise Exception(msg)
+            # raise Exception(msg)
             print msg
             return {}
         

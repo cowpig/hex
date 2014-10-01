@@ -61,8 +61,11 @@ def vision_for_piece(piece, loc_dict, board_size):
 def wait_read_delete(filename):
     while not os.path.isfile(filename):
         continue
+
     with open(filename) as f:
         gamestate = f.read()
+    print "found input!"
+    print gamestate
     
     os.remove(filename)
     return gamestate

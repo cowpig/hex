@@ -19,8 +19,19 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     if options.test:
-        connA = api.PlayerConnection(mockfileA, mockfileA, "A")
-        connB = api.PlayerConnection(mockfileB, mockfileB, "B")
+        import subprocess, os
+        in_a = "in_a.txt"
+        in_b = "in_b.txt"
+        out_a = "out_a.txt"
+        out_b = "out_b.txt"
+
+        player = os.path.join(os.path.dirname(__file__), "player/example_player.py")
+
+        proc_a = subprocess.Popen(["python", player, out_a, in_a])
+        proc_b = subprocess.Popen(["python", player, out_b, in_b])
+
+        connA = api.PlayerConnection(in_a, out_a, "A")
+        connB = api.PlayerConnection(in_b, out_b, "B")
     else:
         connA = api.PlayerConnection(options['a_input'], options['a_output'], "A")
         connB = api.PlayerConnection(options['b_input'], options['b_output'], "B")
@@ -45,3 +56,7 @@ if __name__ == "__main__":
 
     # update database with winner/loser/gamestate/etc
     print "The game is over and the winner is player {}".format(api.game.winner.id) 
+
+    if options.test:
+        proc_a.terminate()
+        proc_b.terminate()
