@@ -43,14 +43,14 @@ if __name__ == "__main__":
     print api.game.board
     
     # wait 3 seconds before first move
-    time.sleep(1.5)
+    time.sleep(3)
 
     while not api.game.game_over:
         try:
             api.next_move()
             print api.game.board
             # 0.3 seconds per move
-            time.sleep(0.2)
+            time.sleep(10)
         except KeyboardInterrupt:
             import pdb; pdb.set_trace()
 

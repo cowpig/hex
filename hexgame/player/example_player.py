@@ -86,7 +86,7 @@ def play_game(input_filename, output_filename):
 
         try:
             state = json.loads(gamestate)
-        except ValueError e:
+        except ValueError as e:
             continue
 
         my_id = state.keys()[0]
