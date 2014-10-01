@@ -84,7 +84,10 @@ def play_game(input_filename, output_filename):
     while True:
         gamestate = wait_read_delete(input_filename)
 
-        state = json.loads(gamestate)
+        try:
+            state = json.loads(gamestate)
+        except ValueError e:
+            continue
 
         my_id = state.keys()[0]
         state = state[my_id]
