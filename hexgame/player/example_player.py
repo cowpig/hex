@@ -64,8 +64,8 @@ def wait_read_delete(filename):
 
     with open(filename) as f:
         gamestate = f.read()
-    print "found input!"
-    print gamestate
+    # print "found input!"
+    # print gamestate
     
     os.remove(filename)
     return gamestate

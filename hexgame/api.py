@@ -50,7 +50,7 @@ class GameApi(object):
         make_nearly_random_moves(self.game.opponent(player), self.game, self.game.board)
 
     def next_move(self):
-        print "next move..."
+        # print "next move..."
         # print "A"
         # for piece in self.game.get_game_state()["A"]["pieces"]:
         #     print piece["id"], piece["loc"]
