@@ -20,7 +20,7 @@ class PlayerConnection(object):
         try:
             with open(self.orderfile, "wb") as f:
                 f.write(string)
-            print string, "written to {}".format(f)
+            # print string, "written to {}".format(f)
         except Exception as e:
             print "error writing to file {} :\n{}".format(self.statefile, e)
 
