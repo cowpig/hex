@@ -30,11 +30,11 @@ if __name__ == "__main__":
         proc_a = subprocess.Popen(["python", player, orders_a, state_a])
         proc_b = subprocess.Popen(["python", player, orders_b, state_b])
 
-        connA = api.PlayerConnection(orders_a, out_a, "A")
-        connB = api.PlayerConnection(orders_b, out_b, "B")
+        connA = api.PlayerConnection(orders_a, state_a, "A")
+        connB = api.PlayerConnection(orders_b, state_b, "B")
     else:
-        connA = api.PlayerConnection(options.a_ord, options.a_out, "A")
-        connB = api.PlayerConnection(options.b_ord, options.b_out, "B")
+        connA = api.PlayerConnection(options.a_ord, options.a_state, "A")
+        connB = api.PlayerConnection(options.b_ord, options.a_state, "B")
 
     api = api.GameApi(connA, connB)
 
