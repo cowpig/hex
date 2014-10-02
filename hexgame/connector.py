@@ -9,7 +9,7 @@ if __name__ == "__main__":
     parser.add_option("", "--b_ord", dest="b_ord",
                         help="orders file for player B", metavar="FILE")
     
-    parser.add_option("", "--a_state", dest="b_state",
+    parser.add_option("", "--a_state", dest="a_state",
                         help="gamestate file for player A", metavar="FILE")
     parser.add_option("", "--b_state", dest="b_state",
                         help="gamestate file for player B", metavar="FILE")
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         connB = api.PlayerConnection(orders_b, state_b, "B")
     else:
         connA = api.PlayerConnection(options.a_ord, options.a_state, "A")
-        connB = api.PlayerConnection(options.b_ord, options.a_state, "B")
+        connB = api.PlayerConnection(options.b_ord, options.b_state, "B")
 
     api = api.GameApi(connA, connB)
 
@@ -43,14 +43,14 @@ if __name__ == "__main__":
     print api.game.board
     
     # wait 3 seconds before first move
-    time.sleep()
+    time.sleep(3)
 
     while not api.game.game_over:
         try:
             api.next_move()
             print api.game.board
             # 0.3 seconds per move
-            time.sleep(10)
+            time.sleep(2)
         except KeyboardInterrupt:
             import pdb; pdb.set_trace()
 
